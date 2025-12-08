@@ -781,7 +781,7 @@ button{
     body {
         padding-bottom: 70px;
         overflow-x: hidden;
-        width: 100%;
+        width: 100vw;
         position: relative;
     }
 
@@ -789,15 +789,20 @@ button{
     #main-content {
         position: relative;
         left: 0 !important;
-        width: 100%;
+        width: 100% !important;
         padding: 0;
+        margin-left: 0;
+        margin-right: 0 !important;
+        overflow-x: hidden;
     }
 
     #view-container{
-        height: fit-content; 
-        width: 100%;
-        padding: 0 15px;
-        overflow-x: hidden;
+        width: 100% !important;
+        padding: 0 15px 100px 15px !important;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        min-height: 80vh;
     }
     .content-view{
         height: 100%;
@@ -878,55 +883,49 @@ button{
     .cards-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px 0 20px 0;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    .card-content{
+        display: flex;
         gap: 10px;
-        margin-bottom: 15px;
-        margin-top: 15px;
+    }
+
+    .card-icon{
+        width: 20px;
+        height: 20px;
+        aspect-ratio: 1/1;
+    }
+
+    .card-icon.humid-icon{
+         width: 20px;
+        height: 20px;
+        aspect-ratio: 1/1;
+    }
+
+    .card-content span{
+        display: flex;
     }
 
     .card {
-        padding: 12px;
-        min-height: 160px;
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        padding: 15px;
+        min-height: auto;
     }
 
     .card h3 {
-        font-size: 18px;
-        margin-top: 6px;
-        margin-bottom: 0;
-        line-height: 1.3;
-    }
-
-    .card-value {
-        font-size: 18px !important;
-        line-height: 1.2;
-    }
-
-    .card-content {
-        flex: 0 0 auto;
+        font-size: 20px;
     }
 
     .card-content span {
-        font-size: 12px;
-        line-height: 1.3;
+        font-size: 14px;
     }
 
-    .card p {
-        font-size: 11px;
-        padding-top: 6px;
-        margin: 0;
-        line-height: 1.2;
-    }
-
-    .card-footer {
-        flex: 0 0 auto;
-    }
-
-    .card-footer p {
-        font-size: 10px;
-        color: rgba(32, 49, 70, 0.7);
-        margin: 0;
+    .card-footer p{
+        font-size: 14px;
     }
 
    
@@ -941,9 +940,10 @@ button{
         width: 100%;
     }
 
-    .sensor-name h3, .current-val h3, .current-status h3 {
-        font-size: 16px;
+    .sensor-name h3{
+        font-size: 12px;
     }
+
 
     /* MAPS */
     .maps-box {
@@ -956,7 +956,7 @@ button{
     }
 
     .maps h4{
-        font-size: 18px;
+        font-size: 22px;
     }
 
     /* SWITCH BUTTONS */
@@ -965,40 +965,19 @@ button{
     }
 
     .swicth-btn-box {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+
+        gap: 8px;
+        flex-wrap: wrap;
         width: 100%;
-        background-color: transparent;
-        padding: 0;
     }
 
     .sub-btn {
-        padding: 12px;
+        flex: 1;
+        min-width: 70px;
+        padding: 10px 14px 10px 8px;
         font-size: 12px;
-        width: 100%;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3 ease;
+        
     }
-
-    .sub-btn.active {
-        background-color: var(--primary-color-400);
-        color: var(--primary-color-50);
-        box-shadow: var(--shadow-color);
-    }
-
-    .sub-btn:not(.active) {
-        background-color: var(--primary-color-100);
-        color: var(--primary-color-400);
-    }
-
-    .sub-btn:not(.active):hover {
-        background-color: var(--primary-color-200);
-    }
-
-
-
 
 
         /* MOBILE BOTTOM NAVBAR */
@@ -1083,11 +1062,11 @@ button{
     }
 
     .sensor-name p, .current-val p, .current-status p{
-        font-size: 12px;
+        font-size: 14px !important;
     }
     
     .sensor-name h3, .current-val h3, .current-status h3{
-        font-size: 18px;
+        font-size: 18px !important;
     }
      /* CHARTS */
     .chart {
@@ -1104,32 +1083,36 @@ button{
     }
 
     .daily-chart h4, .weekly-chart h4{
-        font-size: 16px;
+        font-size: 22px;
     }
 
     .chart h5{
-        font-size: 12px;
+        font-size: 16px;
     }
 
     /* WEATHER PAGE STYLE - MOBILE */
     .prakiraan-cuaca h4{
-        font-size: 18px;
+        font-size: 22px;
+        display: flex;
+        margin-bottom: 20px;
 
     }
 
     #cuaca-placeholder{
         flex: 1 ;
-        height: auto;
+        height: 100%;
+        width: 100%;
+        padding: 0;
     }
 
     .forecast-day{
-        font-size: 14px;
+        font-size: 20px;
         font-weight: 500;
         color: var(--primary-color-800);
     }
 
     .forecast-temp{
-        font-size: 12px;
+        font-size: 16px;
     }
 
     .forecast-details {
@@ -1137,8 +1120,7 @@ button{
         flex-direction: row;
         align-items: center;       
         justify-content: space-around;   
-        gap: 15px;
-        flex-wrap: wrap;
+        gap: 50px;
     }
 
 
@@ -1158,29 +1140,18 @@ button{
         fill: var(--primary-color-800);
     }
 
-    .prakiraan-cuaca-box {
-        margin-bottom: 20px;
-        padding: 0 15px;
-        overflow-x: hidden;
-    }
-
     .prakiraan-cuaca {
         padding: 15px;
-        width: 100%;
-        overflow-x: hidden;
     }
 
     .forecast-row {
         padding: 10px 5px;
-        gap: 12px;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        gap: 15px;
     }
 
     .forecast-day {
-        font-size: 14px;
-        min-width: auto;
-        flex: 0 0 auto;
+        font-size: 16px;
+        min-width: 100px;
     }
 
     .forecast-humidity, .forecast-temp {
