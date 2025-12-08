@@ -796,6 +796,8 @@ button{
     #view-container{
         height: fit-content; 
         width: 100%;
+        padding: 0 15px;
+        overflow-x: hidden;
     }
     .content-view{
         height: 100%;
@@ -887,11 +889,11 @@ button{
     }
 
     .card h3 {
-        font-size: 22px;
+        font-size: 20px;
     }
 
     .card-content span {
-        font-size: 18px;
+        font-size: 14px;
     }
 
    
@@ -921,7 +923,7 @@ button{
     }
 
     .maps h4{
-        font-size: 22px;
+        font-size: 18px;
     }
 
     /* SWITCH BUTTONS */
@@ -930,18 +932,36 @@ button{
     }
 
     .swicth-btn-box {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
         width: 100%;
+        background-color: transparent;
+        padding: 0;
     }
 
     .sub-btn {
-        flex: 1;
-        min-width: 70px;
-        padding: 10px 14px 10px 8px;
+        padding: 12px;
         font-size: 12px;
-        
+        width: 100%;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3 ease;
+    }
+
+    .sub-btn.active {
+        background-color: var(--primary-color-400);
+        color: var(--primary-color-50);
+        box-shadow: var(--shadow-color);
+    }
+
+    .sub-btn:not(.active) {
+        background-color: var(--primary-color-100);
+        color: var(--primary-color-400);
+    }
+
+    .sub-btn:not(.active):hover {
+        background-color: var(--primary-color-200);
     }
 
 
@@ -1030,11 +1050,11 @@ button{
     }
 
     .sensor-name p, .current-val p, .current-status p{
-        font-size: 18px;
+        font-size: 14px;
     }
     
     .sensor-name h3, .current-val h3, .current-status h3{
-        font-size: 22px;
+        font-size: 20px;
     }
      /* CHARTS */
     .chart {
@@ -1060,7 +1080,7 @@ button{
 
     /* WEATHER PAGE STYLE - MOBILE */
     .prakiraan-cuaca h4{
-        font-size: 22px;
+        font-size: 18px;
 
     }
 
@@ -1070,21 +1090,22 @@ button{
     }
 
     .forecast-day{
-        font-size: 20px;
+        font-size: 14px;
         font-weight: 500;
         color: var(--primary-color-800);
     }
 
     .forecast-temp{
-        font-size: 16px;
+        font-size: 12px;
     }
 
     .forecast-details {
         display: flex;
         flex-direction: row;
         align-items: center;       
-        justify-content: center;   
-        gap: 100px;
+        justify-content: space-around;   
+        gap: 15px;
+        flex-wrap: wrap;
     }
 
 
@@ -1106,20 +1127,27 @@ button{
 
     .prakiraan-cuaca-box {
         margin-bottom: 20px;
+        padding: 0 15px;
+        overflow-x: hidden;
     }
 
     .prakiraan-cuaca {
         padding: 15px;
+        width: 100%;
+        overflow-x: hidden;
     }
 
     .forecast-row {
         padding: 10px 5px;
-        gap: 15px;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: space-between;
     }
 
     .forecast-day {
-        font-size: 16px;
-        min-width: 100px;
+        font-size: 14px;
+        min-width: auto;
+        flex: 0 0 auto;
     }
 
     .forecast-humidity, .forecast-temp {
