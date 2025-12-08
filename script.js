@@ -205,12 +205,16 @@ function renderChart(canvasId, type, labels, data, color, labelName) {
 
     const isWeekly = canvasId.includes('Weekly');
     const totalData = labels.length; // Hitung total jumlah data
+    
+    // Tentukan ukuran font berdasarkan lebar device
+    const isMobile = window.innerWidth <= 992;
+    const fontSize = isMobile ? 9 : 11;
 
     // --- KONFIGURASI SUMBU X ---
     const xTickConfig = {
         grid: { display: false },
         ticks: {
-            font: { size: 10 },
+            font: { size: fontSize },
             maxRotation: 0,
             autoSkip: false, // Kita atur manual, jadi matikan autoSkip bawaan
             
@@ -370,7 +374,7 @@ async function loadSensorAnalytics(sensorKey) {
             const key = formatDateKey(d);
             const dayName = d.toLocaleDateString('id-ID', { weekday: 'short' });
             
-            labelsWeekly.push(`${dayName} (${key})`);
+            labelsWeekly.push(dayName);
 
             if (dailyDataMap[key]) {
                 const avg = dailyDataMap[key].sum / dailyDataMap[key].count;
