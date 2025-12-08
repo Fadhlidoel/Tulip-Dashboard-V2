@@ -85,9 +85,10 @@ function getStatus(val, type) {
         return { text: "BAHAYA", color: "#f43f5e" };
     }
     if (type === 'suhu') { // Celcius
+        if (val <= 19) return {text: "DINGIN", color: "#2daafdff"};
         if (val >= 20 && val <= 29) return { text: "NYAMAN", color: "#34d399" };
         if (val > 29 && val <= 34) return { text: "HANGAT", color: "#facc15" };
-        return { text: "PANAS", color: "#f43f5e" };
+        if (val >= 35) return { text: "PANAS", color: "#f43f5e" };
     }
     if (type === 'radiasi') { // CPM (Sesuaikan threshold CPM-nya)
         if (val <= 50) return { text: "NORMAL", color: "#34d399" };
@@ -95,7 +96,7 @@ function getStatus(val, type) {
     }
     if (type === 'lembab') { // %
         if (val >= 40 && val <= 60) return { text: "IDEAL", color: "#34d399" };
-        return { text: "NORMAL", color: "#1760fd" };
+        return { text: "NORMAL", color: "#2daafdff" };
     }
     return { text: "Info", color: "black" };
 }
