@@ -797,12 +797,17 @@ button{
     }
 
     #view-container{
-        width: 100% !important;
-        padding: 0 15px 100px 15px !important;
-        box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        min-height: 80vh;
+        padding: 0 30px 45px 30px;
+        gap: 34px;
+        align-self: stretch;
+        align-items: stretch;
+        width: 100%;
+        height: 100%;
+
+        align-items: center;
+        justify-self: stretch;
     }
     .content-view{
         height: 100%;
@@ -882,7 +887,7 @@ button{
     /* CARDS GRID */
     .cards-container {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
         margin-bottom: 20px 0 20px 0;
         margin-top: 20px;
@@ -911,9 +916,8 @@ button{
     }
 
     .card {
-        display: flex;
-        padding: 15px;
-        min-height: auto;
+    min-width: 0;
+    box-sizing: border-box;
     }
 
     .card h3 {
@@ -932,16 +936,20 @@ button{
 
     /* SENSOR PANEL */
     .info-card {
+        display: flex;
         flex-direction: column;
         gap: 12px;
     }
 
-    .sensor-name, .current-val, .current-status {
+    .card, .sensor-name, .current-val, .current-status {
+        min-width: 0;
+        box-sizing: border-box;
         width: 100%;
     }
 
     .sensor-name h3{
         font-size: 12px;
+        display: flex;
     }
 
 
