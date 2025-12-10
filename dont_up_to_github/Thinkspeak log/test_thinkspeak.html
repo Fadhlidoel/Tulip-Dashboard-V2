@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test ThinkSpeak Data</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        pre { background: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        h2 { color: #333; }
+        .field { margin: 10px 0; padding: 10px; background: #e8f4f8; border-left: 4px solid #0066cc; }
+        .empty { background: #ffe6e6; border-left-color: #cc0000; }
+        .field label { font-weight: bold; min-width: 150px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Debug ThinkSpeak Data</h1>
+    <button onclick="testThinkSpeak()">Fetch Data dari ThinkSpeak</button>
+    
+    <h2>Response Raw:</h2>
+    <pre id="raw-output">Loading...</pre>
+
+    <h2>Field Breakdown:</h2>
+    <div id="fields-output"></div>
+
+    <script>
+        async function testThinkSpeak() {
+            const CHANNEL_ID = '3182232';
+            const READ_API_KEY = 'Q4EK1PMPN150NY25';
+            const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`;
+
+            try {
+                console.log('Fetching from:', url);
+                const response = await fetch(url);
+                const json = await response.json();
+                
+                console.log('=== FULL RESPONSE ===');
+                console.log(json);
+                
+                document.getElementById('raw-output').textContent = JSON.stringify(json, null, 2);
+
+                if (json.feeds && json.feeds.length > 0) {
+                    const feed = json.feeds[0];
+                    console.log('\n=== LATEST FEED ===');
+                    console.log(feed);
+
+                    let html = '<h3>Latest Feed Data:</h3>';
+                    html += `<div class="field"><label>Created At:</label> ${feed.created_at}</div>`;
+                    html += `<div class="field"><label>ID:</label> ${feed.id}</div>`;
+                    
+                    // Check all fields
+                    for (let i = 1; i <= 8; i++) {
+                        const fieldKey = `field${i}`;
+                        const value = feed[fieldKey];
+                        const isEmpty = value === null || value === undefined || value === '';
+                        const className = isEmpty ? 'field empty' : 'field';
+                        
+                        html += `<div class="${className}">
+                            <label>${fieldKey}:</label> 
+                            <strong>"${value}"</strong>
+                            ${isEmpty ? ' <span style="color:red;">[KOSONG]</span>' : ''}
+                        </div>`;
+                    }
+
+                    document.getElementById('fields-output').innerHTML = html;
+
+                    // Detailed check
+                    console.log('\n=== FIELD VALUES ===');
+                    console.log('field1 (Radiasi):', feed.field1, typeof feed.field1);
+                    console.log('field2 (CO2):', feed.field2, typeof feed.field2);
+                    console.log('field3 (Suhu):', feed.field3, typeof feed.field3);
+                    console.log('field4 (Kelembapan):', feed.field4, typeof feed.field4);
+                    console.log('field5 (Battery):', feed.field5, typeof feed.field5);
+                    console.log('field6 (RSSI):', feed.field6, typeof feed.field6);
+                    console.log('field7 (GPS Lat):', feed.field7, typeof feed.field7);
+                    console.log('field8:', feed.field8, typeof feed.field8);
+
+                    // Parse test
+                    console.log('\n=== PARSE FLOAT TEST ===');
+                    console.log('parseFloat(field1):', parseFloat(feed.field1));
+                    console.log('parseFloat(field2):', parseFloat(feed.field2));
+                    console.log('parseFloat(field3):', parseFloat(feed.field3));
+                    console.log('parseFloat(field4):', parseFloat(feed.field4));
+
+                    // Check all keys in feed object
+                    console.log('\n=== ALL KEYS IN FEED ===');
+                    console.log(Object.keys(feed));
+                } else {
+                    document.getElementById('fields-output').innerHTML = '<p style="color:red;">TIDAK ADA DATA</p>';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('raw-output').textContent = 'ERROR: ' + error.message;
+            }
+        }
+
+        // Auto run on page load
+        testThinkSpeak();
+    </script>
+</body>
+</html>

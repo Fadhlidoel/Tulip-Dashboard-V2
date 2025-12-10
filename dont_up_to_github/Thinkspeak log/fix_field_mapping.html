@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Field Mapping</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .box { background: white; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f0f0f0; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🔧 Fix Field Mapping - Suhu & Kelembapan</h1>
+        <p>File yang akan diperbaiki: <strong>script.js</strong></p>
+        
+        <h2>Perubahan yang diperlukan:</h2>
+        <ul>
+            <li>SENSORS.suhu: field3 → <strong>field4</strong></li>
+            <li>SENSORS.kelembapan: field4 → <strong>field5</strong></li>
+            <li>SENSOR_CONFIG['suhu']: field3 → <strong>field4</strong></li>
+            <li>SENSOR_CONFIG['kelembapan']: field4 → <strong>field5</strong></li>
+            <li>STATUS_FIELDS: field5→field6, field6→field7, field7→field8</li>
+        </ul>
+        
+        <button onclick="generateFixedFile()">📥 Generate Fixed script.js</button>
+    </div>
+
+    <div class="box">
+        <h2>Output:</h2>
+        <pre id="output">Menunggu...</pre>
+    </div>
+
+    <script>
+        async function generateFixedFile() {
+            const log = [];
+            
+            try {
+                // Fetch file
+                log.push('📡 Fetching script.js...');
+                const response = await fetch('script.js');
+                let content = await response.text();
+                log.push('✅ File loaded');
+                
+                // Show original lines
+                log.push('\n📝 ORIGINAL CONTENT (sampel):');
+                const lines = content.split('\n');
+                lines.forEach((line, idx) => {
+                    if (line.includes("field: 'field3'") || line.includes("field: 'field4'") || line.includes("field: 'field5'")) {
+                        log.push(`Line ${idx+1}: ${line}`);
+                    }
+                });
+                
+                // Perform replacements
+                log.push('\n🔧 APPLYING FIXES...\n');
+                
+                // 1. Fix SENSORS object
+                log.push('1. Fixing SENSORS.suhu: field3 → field4');
+                content = content.replace(
+                    /suhu:\s*\{\s*field:\s*'field3'/,
+                    "suhu: { field: 'field4'"
+                );
+                log.push('   ✅ Done');
+                
+                log.push('2. Fixing SENSORS.kelembapan: field4 → field5');
+                // Need to be careful here - find the kelembapan object after suhu
+                const sensorStart = content.indexOf("kelembapan: {");
+                if (sensorStart > -1) {
+                    const sensorSection = content.substring(sensorStart, sensorStart + 200);
+                    if (sensorSection.includes("field: 'field4'")) {
+                        content = content.substring(0, sensorStart) + 
+                                 sensorSection.replace("field: 'field4'", "field: 'field5'") +
+                                 content.substring(sensorStart + sensorSection.length);
+                        log.push('   ✅ Done');
+                    }
+                }
+                
+                // 2. Fix SENSOR_CONFIG['suhu']
+                log.push('3. Fixing SENSOR_CONFIG[suhu]: field3 → field4');
+                const tempConfigStart = content.indexOf("'suhu' :");
+                if (tempConfigStart > -1) {
+                    const tempSection = content.substring(tempConfigStart, tempConfigStart + 500);
+                    if (tempSection.includes("field: 'field3'")) {
+                        const fixed = tempSection.replace("field: 'field3'", "field: 'field4'");
+                        content = content.substring(0, tempConfigStart) + fixed + 
+                                 content.substring(tempConfigStart + tempSection.length);
+                        log.push('   ✅ Done');
+                    }
+                }
+                
+                // 3. Fix SENSOR_CONFIG['kelembapan']
+                log.push('4. Fixing SENSOR_CONFIG[kelembapan]: field4 → field5');
+                const humidConfigStart = content.indexOf("'kelembapan' :");
+                if (humidConfigStart > -1) {
+                    const humidSection = content.substring(humidConfigStart, humidConfigStart + 500);
+                    if (humidSection.includes("field: 'field4'")) {
+                        const fixed = humidSection.replace("field: 'field4'", "field: 'field5'");
+                        content = content.substring(0, humidConfigStart) + fixed + 
+                                 content.substring(humidConfigStart + humidSection.length);
+                        log.push('   ✅ Done');
+                    }
+                }
+                
+                // Show fixed lines
+                log.push('\n✅ FIXED CONTENT (sampel):');
+                const fixedLines = content.split('\n');
+                fixedLines.forEach((line, idx) => {
+                    if (line.includes("field: 'field4'") || line.includes("field: 'field5'")) {
+                        log.push(`Line ${idx+1}: ${line}`);
+                    }
+                });
+                
+                // Create download link
+                log.push('\n📥 FILE READY FOR DOWNLOAD');
+                log.push('Salin kode di bawah ke text editor dan save sebagai script.js');
+                
+                // Display output
+                document.getElementById('output').innerText = log.join('\n');
+                
+                // Also show download option
+                const blob = new Blob([content], { type: 'text/javascript' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'script.js';
+                document.querySelector('.box').appendChild(a);
+                
+            } catch (error) {
+                log.push('❌ ERROR: ' + error.message);
+                document.getElementById('output').innerText = log.join('\n');
+            }
+        }
+    </script>
+</body>
+</html>

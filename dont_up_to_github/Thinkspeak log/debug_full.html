@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Full Debug Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', monospace; 
+            padding: 20px; 
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #4ec9b0; margin-bottom: 20px; }
+        h2 { color: #569cd6; margin-top: 30px; margin-bottom: 10px; }
+        h3 { color: #ce9178; margin-top: 15px; }
+        
+        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .status.loading { background: #264f78; }
+        .status.success { background: #155724; color: #d4edda; }
+        .status.error { background: #721c24; color: #f8d7da; }
+        
+        .field-box {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        .field-box.empty {
+            background: #5f2c2c;
+            border-color: #8b2e2e;
+        }
+        .field-label {
+            color: #9cdcfe;
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+        .field-value {
+            color: #ce9178;
+            font-weight: bold;
+        }
+        .field-type {
+            color: #858585;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+            color: #d4d4d4;
+        }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #252526; border: 1px solid #3e3e42; padding: 15px; border-radius: 4px; }
+        
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover { background: #005a9e; }
+        
+        .console-log {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .log-item {
+            padding: 5px;
+            border-bottom: 1px solid #3e3e42;
+            font-size: 12px;
+        }
+        .log-info { color: #4ec9b0; }
+        .log-error { color: #f48771; }
+        .log-warn { color: #dcdcaa; }
+        .log-success { color: #6a9955; }
+        
+        .field-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .field-compare-item {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .field-name { color: #9cdcfe; font-weight: bold; }
+        .field-check { font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 FULL DEBUGGING DASHBOARD</h1>
+        
+        <div>
+            <button onclick="testThinkSpeak()">🔄 Fetch Data ThinkSpeak</button>
+            <button onclick="testMappings()">🗂️ Test Field Mappings</button>
+            <button onclick="clearLogs()">🗑️ Clear Logs</button>
+        </div>
+
+        <div class="status loading" id="status">Siap untuk test...</div>
+
+        <h2>📊 Raw ThinkSpeak Response</h2>
+        <pre id="raw-response">Belum ada data</pre>
+
+        <h2>📈 Field Comparison</h2>
+        <div class="field-comparison" id="field-comparison">
+            <div class="field-compare-item">
+                <div class="field-name">Field 1</div>
+                <div class="field-check" id="f1-check">?</div>
+                <div id="f1-val">-</div>
+            </div>
+            <div class="field-compare-item">
+                <div class="field-name">Field 2</div>
+                <div class="field-check" id="f2-check">?</div>
+                <div id="f2-val">-</div>
+            </div>
+            <div class="field-compare-item">
+                <div class="field-name">Field 3</div>
+                <div class="field-check" id="f3-check">?</div>
+                <div id="f3-val">-</div>
+            </div>
+            <div class="field-compare-item">
+                <div class="field-name">Field 4</div>
+                <div class="field-check" id="f4-check">?</div>
+                <div id="f4-val">-</div>
+            </div>
+        </div>
+
+        <h2>🔐 Field Detail Breakdown</h2>
+        <div id="field-breakdown"></div>
+
+        <h2>🗺️ Field Mapping Check</h2>
+        <div id="mapping-check"></div>
+
+        <h2>📝 Console Logs</h2>
+        <div class="console-log" id="console-logs">
+            <div class="log-item log-info">System ready...</div>
+        </div>
+    </div>
+
+    <script>
+        // Intercept console.log
+        const logs = [];
+        const origLog = console.log;
+        const origError = console.error;
+        const origWarn = console.warn;
+
+        console.log = function(...args) {
+            origLog(...args);
+            addLog(args.join(' '), 'info');
+        };
+        console.error = function(...args) {
+            origError(...args);
+            addLog(args.join(' '), 'error');
+        };
+        console.warn = function(...args) {
+            origWarn(...args);
+            addLog(args.join(' '), 'warn');
+        };
+
+        function addLog(msg, type) {
+            logs.push({msg, type, time: new Date().toLocaleTimeString()});
+            updateLogs();
+        }
+
+        function updateLogs() {
+            const logDiv = document.getElementById('console-logs');
+            logDiv.innerHTML = logs.map(log => 
+                `<div class="log-item log-${log.type}"><span style="color:#858585">[${log.time}]</span> ${escapeHtml(JSON.stringify(log.msg))}</div>`
+            ).join('');
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs.length = 0;
+            updateLogs();
+            addLog('Logs cleared', 'info');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        const CHANNEL_ID = '3182232';
+        const READ_API_KEY = 'Q4EK1PMPN150NY25';
+
+        async function testThinkSpeak() {
+            const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`;
+            document.getElementById('status').className = 'status loading';
+            document.getElementById('status').innerText = '⏳ Fetching...';
+
+            try {
+                console.log('🌐 Fetching from:', url);
+                const response = await fetch(url);
+                console.log('✅ Response received, status:', response.status);
+                const json = await response.json();
+                console.log('✅ JSON parsed successfully');
+
+                document.getElementById('raw-response').innerText = JSON.stringify(json, null, 2);
+
+                if (!json.feeds || json.feeds.length === 0) {
+                    updateStatus('❌ NO DATA IN FEEDS', 'error');
+                    return;
+                }
+
+                const feed = json.feeds[0];
+                console.log('📦 Latest feed:', feed);
+
+                // Update field comparison
+                updateFieldComparison(feed);
+                updateFieldBreakdown(feed);
+
+                document.getElementById('status').className = 'status success';
+                document.getElementById('status').innerText = '✅ Data loaded successfully';
+
+            } catch (error) {
+                console.error('❌ Error:', error.message);
+                updateStatus('❌ ERROR: ' + error.message, 'error');
+            }
+        }
+
+        function updateFieldComparison(feed) {
+            const fields = ['field1', 'field2', 'field3', 'field4'];
+            fields.forEach((field, idx) => {
+                const val = feed[field];
+                const isEmpty = val === null || val === undefined || val === '';
+                document.getElementById(`f${idx+1}-check`).innerText = isEmpty ? '❌' : '✅';
+                document.getElementById(`f${idx+1}-val`).innerText = isEmpty ? 'KOSONG' : val;
+            });
+        }
+
+        function updateFieldBreakdown(feed) {
+            const breakdown = document.getElementById('field-breakdown');
+            let html = '';
+
+            const sensors = [
+                {name: 'Field 1 - Radiasi', field: 'field1', expected: 'CPM'},
+                {name: 'Field 2 - CO2', field: 'field2', expected: 'PPM'},
+                {name: 'Field 3 - Suhu', field: 'field3', expected: '°C'},
+                {name: 'Field 4 - Kelembapan', field: 'field4', expected: '%'},
+                {name: 'Field 5 - Battery', field: 'field5', expected: '%'},
+                {name: 'Field 6 - RSSI', field: 'field6', expected: 'dBm'},
+                {name: 'Field 7 - GPS Lat', field: 'field7', expected: 'decimal'},
+            ];
+
+            sensors.forEach(sensor => {
+                const val = feed[sensor.field];
+                const isEmpty = val === null || val === undefined || val === '';
+                const classname = isEmpty ? 'field-box empty' : 'field-box';
+                
+                html += `<div class="${classname}">
+                    <div class="field-label">${sensor.name}</div>
+                    <div>
+                        <span class="field-value">"${val}"</span>
+                        <span class="field-type">(${typeof val}) ${isEmpty ? '❌ KOSONG' : '✅'}</span>
+                    </div>
+                    <div style="font-size: 0.85em; color: #858585; margin-top: 5px;">Expected: ${sensor.expected}</div>
+                </div>`;
+            });
+
+            breakdown.innerHTML = html;
+        }
+
+        function testMappings() {
+            console.log('🗂️ Testing field mappings...');
+            
+            const SENSORS = {
+                radiasi: { field: 'field1', htmlId:'radiation-value' },
+                karbon: { field: 'field2', htmlId:'carbon-value' },
+                suhu: { field: 'field3', htmlId:'temperature-value' },
+                kelembapan: { field: 'field4', htmlId:'humidity-value' }
+            };
+
+            let html = '<h3>Sensor to HTML Mapping</h3>';
+            
+            for (const sensorType in SENSORS) {
+                const sensor = SENSORS[sensorType];
+                const element = document.getElementById(sensor.htmlId);
+                const exists = element !== null;
+                const status = exists ? '✅' : '❌';
+                
+                console.log(`${status} ${sensorType}: field="${sensor.field}" htmlId="${sensor.htmlId}" (exists: ${exists})`);
+                
+                html += `<div class="field-box ${exists ? '' : 'empty'}">
+                    <div class="field-label">${sensorType.toUpperCase()}</div>
+                    <div>
+                        <span style="color: #9cdcfe;">${sensor.field}</span>
+                        <span style="color: #ce9178;"> → </span>
+                        <span style="color: #4ec9b0;">#${sensor.htmlId}</span>
+                        <span style="margin-left: 20px;">${status}</span>
+                    </div>
+                </div>`;
+            }
+
+            document.getElementById('mapping-check').innerHTML = html;
+        }
+
+        function updateStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.innerText = msg;
+            el.className = 'status ' + type;
+        }
+
+        // Auto test on load
+        window.addEventListener('load', () => {
+            addLog('Page loaded', 'success');
+            testMappings();
+            testThinkSpeak();
+        });
+    </script>
+</body>
+</html>

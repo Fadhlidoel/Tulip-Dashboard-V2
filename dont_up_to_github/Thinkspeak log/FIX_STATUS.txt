@@ -1,0 +1,60 @@
+Fix Field Mapping - Status Report
+
+=== PERUBAHAN YANG SUDAH DILAKUKAN ===
+
+✅ 1. SENSORS object (lines 4-21)
+   - suhu: field3 → field4
+   - kelembapan: field4 → field5
+
+✅ 2. STATUS_FIELDS object (lines 23-27)
+   - BATT_FIELD: field5 → field6
+   - RSSI_FIELD: field6 → field7
+   - GPS_LAT_FIELD: field7 → field8
+
+✅ 3. updateMetricCards() function
+   - values.suhu: parseFloat(dataFeed['field4'])
+   - values.kelembapan: parseFloat(dataFeed['field5'])
+
+✅ 4. processThingspeakData() function logging
+   - Updated logging untuk field4-field8
+
+⚠️ 5. SENSOR_CONFIG object (PARTIAL)
+   - 'suhu': field: 'field3' → field: 'field4' ✅ DONE
+   - 'kelembapan': field: 'field4' → field: 'field5' ❌ PENDING (spacing issue)
+
+=== INSTRUKSI MANUAL ===
+
+Jika ada masalah dengan spacing, silakan lakukan edit manual:
+
+FILE: script.js
+LINE 58: Ubah
+         field: 'field4', unit: '%', decimals: 1, color: 'rgba(116, 148, 190, 1)',
+
+MENJADI:
+         field: 'field5', unit: '%', decimals: 1, color: 'rgba(116, 148, 190, 1)',
+
+Atau cukup cari-ganti dalam file:
+- Cari: 'kelembapan' : { field: 'field4',
+- Ganti: 'kelembapan' : { field: 'field5',
+
+=== VERIFIKASI ===
+
+Setelah fix manual, verifikasi dengan membuka browser di:
+- quick_debug.html (untuk test data)
+- index.html (untuk full dashboard)
+
+Jika masih bermasalah, possible penyebab:
+1. Device firmware kirim data ke field yang salah
+2. ThinkSpeak API response format berbeda
+3. Cache browser - clear dengan Ctrl+Shift+Delete
+
+=== TESTING ===
+
+Di browser console (F12), jalankan:
+console.log(SENSOR_CONFIG['kelembapan'].field);
+console.log(SENSOR_CONFIG['suhu'].field);
+
+Harus output:
+field4
+field5
+

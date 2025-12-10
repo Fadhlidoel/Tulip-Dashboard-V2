@@ -476,13 +476,14 @@ function processThingspeakData(json) {
     console.log('Feed created_at:', d.created_at);
 
     console.log('=== CHECKING FIELD VALUES ===');
-    console.log('field1:', d.field1, `(type: ${typeof d.field1})`);
-    console.log('field2:', d.field2, `(type: ${typeof d.field2})`);
-    console.log('field3:', d.field3, `(type: ${typeof d.field3})`);
-    console.log('field4:', d.field4, `(type: ${typeof d.field4})`);
-    console.log('field5:', d.field5, `(type: ${typeof d.field5})`);
-    console.log('field6:', d.field6, `(type: ${typeof d.field6})`);
-    console.log('field7:', d.field7, `(type: ${typeof d.field7})`);
+    console.log('field1 (Radiasi):', d.field1, `(type: ${typeof d.field1})`);
+    console.log('field2 (CO2):', d.field2, `(type: ${typeof d.field2})`);
+    console.log('field3 (Reserved):', d.field3, `(type: ${typeof d.field3})`);
+    console.log('field4 (Suhu):', d.field4, `(type: ${typeof d.field4})`);
+    console.log('field5 (Kelembapan):', d.field5, `(type: ${typeof d.field5})`);
+    console.log('field6 (Battery):', d.field6, `(type: ${typeof d.field6})`);
+    console.log('field7 (RSSI):', d.field7, `(type: ${typeof d.field7})`);
+    console.log('field8 (GPS Lat):', d.field8, `(type: ${typeof d.field8})`);
 
     console.groupEnd();
     
@@ -528,15 +529,17 @@ async function updateDashboard() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    updateDashboard();
-
-    setInterval(updateDashboard, 15000);
-});
-
- // FUNGSI INSTALASI DAN NAVIGASI //
-
 document.addEventListener('DOMContentLoaded', function() {
+    console.group('🚀 APP INITIALIZATION');
+    console.log('DOM loaded, starting initialization...');
+
+    // INITIAL DASHBOARD UPDATE
+    updateDashboard();
+    console.log('Initial updateDashboard() called');
+
+    // REFRESH EVERY 15 SECONDS
+    const interval = setInterval(updateDashboard, 15000);
+    console.log('Auto-refresh set to every 15 seconds');
 
     // NAVIGATION
     const navDashBtn = document.getElementById('dash-btn');

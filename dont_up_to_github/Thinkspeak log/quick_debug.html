@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Debug - Copy Console Output</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            max-width: 800px; 
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .box { 
+            background: white; 
+            border: 2px solid #ddd; 
+            padding: 15px; 
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .info { background: #e7f3ff; padding: 10px; border-left: 4px solid #0066cc; margin: 10px 0; }
+        .warning { background: #fff3cd; padding: 10px; border-left: 4px solid #ff9800; margin: 10px 0; }
+        .success { background: #d4edda; padding: 10px; border-left: 4px solid #28a745; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Quick ThinkSpeak Debugger</h1>
+    
+    <div class="info">
+        <strong>Instruksi:</strong>
+        <ol>
+            <li>Buka DevTools (F12) → Console tab</li>
+            <li>Klik tombol di bawah</li>
+            <li>Lihat output di console dan di kotak textarea</li>
+            <li>Copy semua output dan share ke saya</li>
+        </ol>
+    </div>
+
+    <div class="box">
+        <button onclick="runFullDiagnostics()">▶️ RUN FULL DIAGNOSTICS</button>
+    </div>
+
+    <div class="box">
+        <h3>Console Output:</h3>
+        <textarea id="output" readonly></textarea>
+    </div>
+
+    <div class="box">
+        <h3>Key Findings:</h3>
+        <div id="findings"></div>
+    </div>
+
+    <script>
+        const output = [];
+        
+        function log(msg) {
+            console.log(msg);
+            output.push(msg);
+            document.getElementById('output').value = output.join('\n');
+        }
+
+        async function runFullDiagnostics() {
+            output.length = 0;
+            document.getElementById('findings').innerHTML = '';
+            
+            log('═══════════════════════════════════════════');
+            log('🔍 FULL THINKSPEAK DIAGNOSTICS');
+            log('═══════════════════════════════════════════\n');
+
+            // 1. Check API Config
+            log('📋 1. API CONFIGURATION');
+            log('─────────────────────────');
+            const CHANNEL_ID = '3182232';
+            const READ_API_KEY = 'Q4EK1PMPN150NY25';
+            const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`;
+            log('Channel ID: ' + CHANNEL_ID);
+            log('API Key: ' + READ_API_KEY);
+            log('URL: ' + url);
+            log('');
+
+            // 2. Try to fetch
+            log('📡 2. FETCHING DATA');
+            log('─────────────────────────');
+            
+            try {
+                log('Sending request...');
+                const response = await fetch(url);
+                log('✅ Response received');
+                log('Status: ' + response.status + ' ' + (response.ok ? '(OK)' : '(ERROR)'));
+                
+                const json = await response.json();
+                log('✅ JSON parsed');
+                
+                log('\n🔍 3. RESPONSE STRUCTURE');
+                log('─────────────────────────');
+                log('Keys in response: ' + Object.keys(json).join(', '));
+                
+                if (json.channel) {
+                    log('Channel found: ' + json.channel.name);
+                }
+                
+                if (!json.feeds) {
+                    log('❌ ERROR: No feeds array!');
+                    return;
+                }
+                
+                log('Number of feeds: ' + json.feeds.length);
+                
+                if (json.feeds.length === 0) {
+                    log('❌ ERROR: Feeds array is empty!');
+                    return;
+                }
+
+                const feed = json.feeds[0];
+                log('\n📦 4. LATEST FEED DATA');
+                log('─────────────────────────');
+                log('Feed ID: ' + feed.id);
+                log('Created at: ' + feed.created_at);
+                log('Keys in feed: ' + Object.keys(feed).join(', '));
+                
+                log('\n📊 5. FIELD VALUES (CRITICAL CHECK)');
+                log('─────────────────────────');
+                
+                const fieldCheck = {};
+                for (let i = 1; i <= 8; i++) {
+                    const field = `field${i}`;
+                    const val = feed[field];
+                    const isEmpty = val === null || val === undefined || val === '';
+                    const parsed = parseFloat(val);
+                    
+                    fieldCheck[field] = {
+                        raw: val,
+                        isEmpty: isEmpty,
+                        parsed: parsed,
+                        isNaN: isNaN(parsed)
+                    };
+                    
+                    const status = isEmpty ? '❌ KOSONG' : '✅ ADA';
+                    log(`${field}: "${val}" ${status}`);
+                    log(`        → parseFloat: ${parsed}, isNaN: ${isNaN(parsed)}`);
+                }
+                
+                log('\n🎯 6. SENSOR MAPPING CHECK');
+                log('─────────────────────────');
+                
+                const mappings = [
+                    { field: 'field1', sensor: 'RADIASI', htmlId: 'radiation-value' },
+                    { field: 'field2', sensor: 'CO2', htmlId: 'carbon-value' },
+                    { field: 'field3', sensor: 'SUHU ⚠️', htmlId: 'temperature-value' },
+                    { field: 'field4', sensor: 'KELEMBAPAN ⚠️', htmlId: 'humidity-value' },
+                ];
+                
+                const findings = [];
+                
+                mappings.forEach(m => {
+                    const check = fieldCheck[m.field];
+                    const elem = document.getElementById(m.htmlId);
+                    const elemStatus = elem ? '✅' : '❌ MISSING';
+                    
+                    log(`${m.field} (${m.sensor}) → #${m.htmlId} ${elemStatus}`);
+                    log(`   Value: "${check.raw}" ${check.isEmpty ? '[KOSONG]' : '[ADA]'}`);
+                    
+                    if (check.isEmpty) {
+                        findings.push(`⚠️ ${m.sensor} KOSONG di ThinkSpeak`);
+                    }
+                    if (!elem) {
+                        findings.push(`❌ HTML element #${m.htmlId} TIDAK DITEMUKAN`);
+                    }
+                });
+                
+                log('\n⚡ 7. SIMULATION - UPDATE CARDS');
+                log('─────────────────────────');
+                
+                mappings.forEach(m => {
+                    const check = fieldCheck[m.field];
+                    const decimals = (m.sensor === 'RADIASI') ? 3 : 1;
+                    let formatted;
+                    
+                    if (check.isEmpty || isNaN(check.parsed)) {
+                        formatted = '--';
+                    } else {
+                        formatted = check.parsed.toFixed(decimals);
+                    }
+                    
+                    log(`Would set #${m.htmlId} to: "${formatted}"`);
+                });
+                
+                log('\n═══════════════════════════════════════════');
+                log('📝 FINDINGS');
+                log('═══════════════════════════════════════════');
+                
+                if (findings.length === 0) {
+                    log('✅ SEMUA TERLIHAT NORMAL!');
+                } else {
+                    findings.forEach(f => log(f));
+                }
+                
+                // Display findings
+                document.getElementById('findings').innerHTML = 
+                    findings.map(f => `<div class="warning">${f}</div>`).join('') ||
+                    '<div class="success">✅ Tidak ada masalah yang terdeteksi</div>';
+                    
+            } catch (error) {
+                log('❌ ERROR: ' + error.message);
+                log(error.stack);
+                document.getElementById('findings').innerHTML = 
+                    `<div style="background: #f8d7da; padding: 10px; border-left: 4px solid #dc3545;">
+                    ❌ ${error.message}
+                    </div>`;
+            }
+        }
+
+        // Run on page load
+        window.addEventListener('load', runFullDiagnostics);
+    </script>
+</body>
+</html>
