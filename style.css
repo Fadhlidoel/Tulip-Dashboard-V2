@@ -36,21 +36,48 @@ body {
     --tertiary-color-50: #FEF3E6;
     --tertiary-color-100: #FEE7CD;
     --tertiary-color-200: #FDD9AA;
+    --tertiary-color-500: #D97606;
     --tertiary-color-800: #633603;
+
+    --temp-color-50: #ECF5F9;
+    --temp-color-100: #D8ECF3;
+    --temp-color-200: #B2D8E6;
+    --temp-color-500: #368BAA;
+    --temp-color-800: #193F4D;
+
+    --rain-color-50: #F3ECF9;
+    --rain-color-100: #E7D8F3;
+    --rain-color-200: #D0B2E6;
+    --rain-color-500: #7836AA;
+    --rain-color-800: #37194D;
 
     --blue-color: #1760FD;
     --red-color: #de3c13;
     --green-color: #13DE7F;
 
-    --font-h2-size: 48px;
-    --font-h3-size: 32px;
-    --font-h4-size: 24px;
-    --font-h5-size: 20px;
+    --font-h1-desktop-size: 36px;
+    --font-h2-desktop-size: 28px;
+    --font-h3-desktop-size: 22px;
+    --font-h4-desktop-size: 18px;
+    --font-h5-desktop-size: 16px;
+    --font-h6-desktop-size: 14px;
 
-    --font-body-size: 18px;
-    --font-body-small-size: 14px;
+    --font-body-desktop-size: 16px;
+    --font-body-desktop-small-size: 13px;
 
-    --font-button-size: 16px;
+    --fotn-h1-mobile-size: 28px;
+    --font-h2-mobile-size: 22px;
+    --font-h3-mobile-size: 18px;
+    --font-h4-mobile-size: 16px;
+    --font-h5-mobile-size: 14px;
+    --font-h6-mobile-size: 12px;
+
+    --font-body-mobile-size: 15px;
+    --font-body-mobile-small-size: 12px;
+    
+
+    --font-button-desktop-size: 15px;
+    --font-button-mobile-size: 14px;
     --font-button-large-size: 24px;
     
     --border-radius: 20px;
@@ -88,46 +115,16 @@ body {
     padding: 30px 25px;
     align-self: stretch;
     height: 100%;
-    width: 250px;
+    width: 100px;
     z-index: 99;
 }
 
-.logo-web{
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    align-self: stretch;
-    fill: var(--primary-color-800);
-}
 
-.logo{
-    width: 55px;
-    height: 55px;
-    aspect-ratio: 1/1;
-}
-
-
-.logo-text h4 {
-    font-size: var(--font-h4-size);
-    font-weight: 600;
-    color: var(--primary-color-800);
-    line-height: 1.2;
-    margin-bottom: 2px;
-    margin-top: 0;
-}
-
-.logo-text p {
-    font-size: var(--font-body-small-size);
-    font-weight: 400;
-    color: var(--primary-color-800);
-    margin-top: 0;
-    margin-bottom: 0;
-}
 
 ul {
     display: flex;
     flex-direction: column;
-    align-content: start;
+    align-content: center;
     align-self: center;
     gap: 50px;
     padding: 0;
@@ -139,31 +136,33 @@ ul {
 .navbar-kiri ul li a{
     display: flex;
     align-items: center;
-    gap: 10px;
-    align-self: stretch;
-    justify-content: flex-start;
-    text-decoration: none;
-    font-size: var(--font-button-large-size);
-    font-weight: 500;
+    justify-content: center;
     color: #203146;
+
 }
 
 .navbar-kiri ul li a svg{
     width: 30px;
     height: 30px;
     aspect-ratio: 1/1;
-    fill: #203146;
+    align-items: center;
+    justify-content: center;
 }
 
 .navbar-kiri ul li.active a{
     background-color: #203146;
+    border-radius: 8px;
     color: #EEF2F7;
-    padding-bottom:10px;
-    padding-top: 10px;
-    padding-left: 15px;
-    margin-right: -25px;
-    border-radius: 15px;
     box-shadow: var(--shadow-color);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 12px;
+    width: fit-content;
+    aspect-ratio: 1/1;
+    margin: 0;
 }
 
 .navbar-kiri ul li.active svg{
@@ -172,14 +171,14 @@ ul {
 
 
 
-/*MAIN CONTENT STYLES*/
+/*MAIN CONTENT STYLES*/ 
 #main-content {
     flex-grow: 1;
     position: relative;
     height: 100%;
     position: relative;
-    left: 250px;
-    width: calc(100% - 250px);
+    left: 110px;
+    width: calc(100% - 110px);
 }
 
 
@@ -191,14 +190,31 @@ ul {
     align-items: flex-start;
     align-self: stretch;
 }
-
-.header-content h2{
-    font-size: var(--font-h2-size);
+.header-content h3{
+    font-size: var(--font-h2-desktop-size);
     font-weight: 600;
     color: var(--primary-color-800);
     margin: 0;
+    padding-bottom: 10px;
+}
+.header-content p{
+    margin: 0;
+    font-size: var(--font-body-desktop-size);
+}
+.logo-web{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    align-self: stretch;
+    fill: var(--primary-color-800);
+}
+.logo{
+    width: 65px;
+    height: 65px;
+    aspect-ratio: 1/1;
 }
 
+/* --- INDIKATOR --- */
 .indikator-box{
 
     display: flex;
@@ -265,7 +281,7 @@ ul {
 /* MAIN CONTENT CARDS STYLES */
 #view-container{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     padding: 0 30px 45px 30px;
     gap: 34px;
     align-self: stretch;
@@ -280,13 +296,22 @@ ul {
     width: 100%;
     height: fit-content;
 }
+
 .cards-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* SMALL CARD STYLE */
+.cards-container-small{
     display: flex;
     flex-direction: row;
     gap: 20px;
     width: 100%;
-    margin-bottom: 45px;
-
+    margin-bottom: 30px;
 }
 
 .card{
@@ -296,12 +321,28 @@ ul {
     justify-content: space-between;
     align-items: flex-start;
     width: 100%;
-    height: 100%;
+    height: auto;
     min-height: 180px;
     background-color: var(--card-color);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-color);
 
+    transition: transform 0.4s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 8px 24px 0 rgba(129, 129, 129, 0.35);
+}
+
+.card.card-radiation{
+    min-height: 240px;
+}
+
+.cards-container-small .card{
+    flex: 1;
+    min-height: 180px;
 }
 
 .card-content{
@@ -309,7 +350,12 @@ ul {
     align-items: center;
     gap: 10px;
     align-self: stretch;
-    height: 100%;
+    height: auto;
+}
+
+.card-content span{
+    font-size: var(--font-body-size);
+    font-weight: 500;
 }
 
 .card-icon{
@@ -317,16 +363,31 @@ ul {
     height: 45px;
     aspect-ratio: 1/1;
 }
-.card-icon.humid-icon{
-    width: 45px;
-    height: 45px;
-    aspect-ratio: 1/1;
-}
+
 .card h3{
     font-size: var(--font-h3-size);
     font-weight: 600;
-    margin-top: 15px;
+    margin-top: 0;
     align-self: stretch;
+}
+
+.card.card-radiation h3{
+    font-size: 64px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.cards-container-small .card h3{
+    font-size: var(--font-h2-desktop-size);
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 0;
+    align-self: stretch;
+}
+
+.card-footer{
+    margin-top: auto;
+    width: 100%;
 }
 
 .card p{
@@ -351,6 +412,14 @@ ul {
     background-color: var(--tertiary-color-50);
     border-radius: 5px;
 }
+.rad-value2{
+    margin-top: 10px;
+    margin-bottom: 0;
+
+    font-size: var(--font-body-desktop-size);
+    color: var(--tertiary-color-500);
+}
+
 
 .card.card-carbon{
     border: 1px solid var(--secondary-color-100);
@@ -367,16 +436,16 @@ ul {
 }
 
 .card.card-temperature{
-    border: 1px solid var(--primary-color-100);
-    color: var(--primary-color-800);
+    border: 1px solid var(--temp-color-100);
+    color: var(--temp-color-800);
 }
 .card.card-temperature:hover{
-    border: 1px solid var(--primary-color-200);
+    border: 1px solid var(--temp-color-200);
     box-shadow: 0px 4px 20px 0 rgba(129, 129, 129, 0.25);
 }
 .card-icon.temp-icon{
-    fill: var(--primary-color-800);
-    background-color: var(--primary-color-50);
+    fill: var(--temp-color-800);
+    background-color: var(--temp-color-50);
     border-radius: 5px;
 }
 
@@ -394,28 +463,73 @@ ul {
     border-radius: 5px;
 }
 
-/* PRAKIRAAN CUACA STYLE*/
-.prakiraan-cuaca-box{
-    display: flex;
-    flex-direction: row;
-    padding: 0 0px 45px 0;
-    gap: 34px;
-    align-self: stretch;
+.card.card-weather{
+    border: 1px solid var(--rain-color-100);
+    color: var(--rain-color-800);
+}
+
+.card.card-weather:hover{
+    border: 1px solid var(--rain-color-200);
+    box-shadow: 0px 4px 20px 0 rgba(129, 129, 129, 0.25);
+}
+.card-icon.weather-icon{
+    fill: var(--rain-color-800);
+    background-color: var(--rain-color-50);
+    border-radius: 5px;
+}
+.rad-value2.altitude{
+    margin-top: 10px;
+    margin-bottom: 0;
+
+    font-size: var(--font-body-desktop-size);
+    color: var(--rain-color-500);
+}
+    
+
+/* PERKIRAAN HUJAN STYLE*/
+.card.card-rain{
+    transition: none;
     align-items: flex-start;
+    justify-content: flex-start;
+}
+.card.card-rain:hover{
+    transform: none;
+    box-shadow: var(--shadow-color);
+    cursor: default;
+}
+.card.card-rain span{
+    font-size: var(--font-body-desktop-size);
+}
+.card-value.rain{
+    font-size: var(--font-h1-desktop-size);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+#rain-desc span{
+    padding: 0;
+    margin-top: 0;
+}
+/* CUACA DAN MAPS*/
+
+.prakiraan-cuaca-box{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-self: stretch;
+    align-items: stretch;
     width: 100%;
-    height: 100%;
+    margin-bottom: 45px;
 }
 
 .prakiraan-cuaca{
     display: flex;
     flex-direction: column;
     padding: 20px 16px;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
     align-self: stretch;
     width: 100%;
     height: fit-content;
-    min-height: fit-content;
     background-color: var(--card-color);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-color);
@@ -426,16 +540,7 @@ ul {
     font-weight: 600;
     color: var(--primary-color-800);
     margin: 0;
-}
-
-.prakiraan-cuaca-content{
-    display: flex;
-    align-self: stretch;
-    margin-top: 15px;
-    background-color: var(--primary-color-50);
-    min-height: 400px;
-    width: 100%;
-    border-radius: var(--border-radius);
+    margin-bottom: 15px;
 }
 
 /* FORECAST ROW STYLES */
@@ -515,12 +620,11 @@ ul {
     display: flex;
     flex-direction: column;
     padding: 20px 16px;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
     align-self: stretch;
     width: 100%;
-    height: fit-content;
-    min-height: fit-content;
+    height: auto;
     background-color: var(--card-color);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-color);
@@ -531,15 +635,17 @@ ul {
     font-weight: 600;
     color: var(--primary-color-800);
     margin: 0;
+    margin-bottom: 15px;
 }
 
 .maps-content{
     display: flex;
     align-self: stretch;
-    margin-top: 15px;
-    background-color: var(--primary-color-50);
-    min-height: 400px;
     width: 100%;
+    height: 100%;
+    padding: 20px;
+    background-color: var(--primary-color-50);
+    min-height: 300px;
     border-radius: var(--border-radius);
 }
 
@@ -550,14 +656,13 @@ ul {
 }
 
 .swicth-container{
-    display: flex;
+    display: none !important;
     flex-direction: row;
     height: auto;
     width: 100%;
 
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 30px;
 }
 
 .swicth-container h3{
@@ -607,562 +712,187 @@ button{
     background-color: var(--primary-color-100);
 }
 
-/* RADIATION PAGE STYLE */
+/* ---------------- SENSOR DETAIL STYLE ---------------- */
 
-.sensor-panel{
+/*--- INFO CONTAINER ---*/
+.info-cont{
     display: flex;
+    height: fit-content;
+    width: 100%;
+    padding: 45px 0 45px 0;
+    align-items: flex-start;
+    gap: 20px;
+    padding-top: 0;
+    flex-shrink: 0;
+    align-self: stretch;
+}
+.info-left{
+    display: flex;
+    padding: 20px;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-start;
-
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.info-card{
-    display: flex;
-    flex-direction: row;
     gap: 20px;
-    width: 100%;
-    margin-bottom: 45px;
-    justify-content:space-between;
-}
+    flex: 1 0 0;
+    align-self: stretch;
 
-.sensor-name, .current-val, .current-status{
-    background-color: var(--navbar-color);
     border-radius: 20px;
     box-shadow: var(--shadow-color);
-    border: 1px solid var(--tertiary-color-100);
+    background-color: var(--navbar-color);
+}
+.info-icon{
+    display: flex;
+    padding: 0;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+}
+.info-icon h4{
+    font-size: var(--font-h4-desktop-size);
+    font-weight: 500;
+    margin: 0;
+}
+.sensor-value{
+    margin: 0;
+    font-size: var(--font-h1-desktop-size);
+    font-weight: 550;
+}
 
-    flex: 1 1 200px;
-    width: 100%;
-    height: 100%;
+.info-right{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+.right-up{
+    display: flex;
     padding: 20px 16px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    min-height: 200px;
+    gap: 20px;
+    flex: 1 0 0;
+    align-self: stretch;
 
-    transition: all 0.5 ease;
-
+    border-radius: 20px;
+    box-shadow: var(--shadow-color);
+    background-color: var(--navbar-color);
 }
-
-.sensor-name:hover, .current-val:hover, .current-status:hover{
-    border: 1px solid var(--tertiary-color-200);
+.ave-box{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1 0 0;
+    align-self: stretch;
 }
+.ave-cont{
+    display: flex;
+    padding: 20px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    flex: 1 0 0;
+    align-self: stretch;
 
-
-.sensor-name p, .current-val p, .current-status p{
-    color: var(--primary-color-800);
-    font-size: var(--font-body-size);
-    font-weight: 400;
+    border-radius: 20px;
+    box-shadow: var(--shadow-color);
+    background-color: var(--navbar-color);
+}
+.right-up h5, .ave-box h5{
     margin: 0;
-
+    padding-bottom: 10px;
+    font-size: var(--font-h5-desktop-size);
+    font-weight: 500;
     width: 100%;
+    border-bottom: 0.5px solid var(--primary-color-50);
+    color: var(--primary-color-400);
 }
-
-.sensor-name h3, .current-val h3{
-    color: var(--tertiary-color-800);
+.right-up h4, .ave-box h4{
+    margin: 0;
+    font-size: var(--font-h4-desktop-size);
     font-weight: 600;
-    font-size: var(--font-h3-size);
-
     width: 100%;
+    color: var(--primary-color-500);
 }
 
-.current-status h3{
-    color: var(--green-color);
-    font-size: var(--font-h3-size);
-
-    width: 100%;
+/* --- CHART CONT ---*/
+.chart-cont{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    align-self: stretch;
 }
-
 .chart{
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    align-self: stretch;
+    width: 100%;
+    
+    border-radius: 20px;
+    box-shadow: var(--shadow-color);
+    background-color: var(--navbar-color);
+}
+.chart-header{
+    display: flex;
+    flex-direction:row ;
+    justify-content: space-between;
+    padding: 0 1px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    width: 100%;
+}
+.chart-header h4{
+    font-size: var(--font-h4-desktop-size);
+    margin: 0;
+    color: var(--primary-color-500);
+    font-weight: 500;
+}
+
+.chart-toggle{
     display: flex;
     flex-direction: row;
     gap: 20px;
-    width: 100%;
-    margin-bottom: 45px;
-    justify-content:space-between;
+}
+.toggle-btn.harian-btn, .toggle-btn.mingguan-btn{
+    display: flex;
+    width: 100px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    
+    border-radius: 10px;
+    border: 1px solid var(--primary-color-400);
+    color: var(--primary-color-400);
+
+    cursor: pointer;
+}
+.toggle-btn.harian-btn.active, .toggle-btn.mingguan-btn.active{
+    display: flex;
+    width: 100px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    
+    border-radius: 10px;
+    border: 0 solid var(--primary-color-400);
+    color: var(--primary-color-50);
+    background-color: var(--primary-color-500);
 }
 
 .chart-wrapper{
-    display: flex;
     width: 100%;
-
-    min-height: 300px;
+    min-height:500px ;
+    max-height:500px;
 }
 
-.daily-chart, .weekly-chart{
-    background-color: var(--navbar-color);
-    border-radius: 20px;
-    box-shadow: var(--shadow-color);
-    border: 1px solid var(--tertiary-color-50);
-
-    display: flex;
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    padding: 20px 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    min-height: 200px;
-}
-
-.daily-chart h4, .weekly-chart h4{
-    font-size: var(--font-h4-size);
-    font-weight: 600;
-    color: var(--primary-color-500);
-    margin:0;
-
-    width: 100%;
-    align-self: stretch;
-}
-
-.chart h5{
-    font-size: var(--font-h5-size);
-    font-weight: 400;
-    color: var(--primary-color-500);
-    margin: 0;
-
-    width: 100%;
-    align-self: stretch;
-
-    border-top: 1px solid var(--primary-color-50);
-    padding-top: 10px;
-}
-
-/* C02 STYLE */
-.sensor-name.c02, .current-val.c02, .current-status.c02{
-    border: 1px solid var(--secondary-color-100)
-}
-
-.sensor-name.c02:hover, .current-val.c02:hover, .current-status.c02:hover{
-    border: 1px solid var(--secondary-color-200)
-}
-
-.sensor-name.c02 h3, .current-val.c02 h3{
-    color: var(--secondary-color-800)
-}
-
-/* TEMP & HUMID STYLE*/
-.sensor-name.temp, .current-val.temp, .current-status.temp, .sensor-name.humid, .current-val.humid, .current-status.humid{
-    border: 1px solid var(--primary-color-100)
-}
-
-.sensor-name.temp:hover, .current-val.temp:hover, .current-status.temp:hover, .sensor-name.humid:hover, .current-val.humid:hover, .current-status.humid:hover{
-    border: 1px solid var(--primary-color-200)
-}
-
-.sensor-name.temp h3, .current-val.temp h3, .sensor-name.humid h3, .current-val.humid h3{
-    color: var(--primary-color-800)
-}
 
 /*------------ MOBILE STYLE ------------------*/
 @media screen and (max-width: 992px){
     
-    /* HIDE DESKTOP */
-
-    .desktop-only{
-        display: none;
-        
-    }
-    .navbar-kiri {
-        display: none !important;
-    }
-
-    #page-title{
-        display: none !important;
-    }
-    /*----------------------------*/
-
-    body {
-        padding-bottom: 70px;
-        overflow-x: hidden;
-        width: 100vw;
-        position: relative;
-    }
-
-    /* MAIN CONTENT */
-    #main-content {
-        position: relative;
-        left: 0 !important;
-        width: 100% !important;
-        padding: 0;
-        margin-left: 0;
-        margin-right: 0 !important;
-        overflow-x: hidden;
-    }
-
-    #view-container{
-        display: flex;
-        flex-direction: column;
-        padding: 0 30px 45px 30px;
-        gap: 34px;
-        align-self: stretch;
-        align-items: stretch;
-        width: 100%;
-        height: 100%;
-
-        align-items: center;
-        justify-self: stretch;
-    }
-    .content-view{
-        height: 100%;
-    }
-
-    /* HEADER */
-    header{
-        display: block !important;
-        background-color: var(--navbar-color);
-
-        margin-bottom: 20px;
-        height: fit-content;
-        width: 100%;
-
-        align-items: center;
-        justify-content: space-around;
-        
-    }
-
-    .header-content{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        height: auto;
-        width: 100%;
-        gap: 20px;
-        border-bottom: 1px solid rgba(32, 49, 70, 0.15);
-    }
-
-    .mobile-header-logo{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        gap: 15px;
-    }
-
-    .mobile-header-logo svg{
-        width: 55px;
-        height: 55px;
-        aspect-ratio: 1/1;
-    }
-
-    .mobile-header-logo h4{
-        font-size: 22px;
-    }
-    .mobile-header-logo p{
-        font-size: 12px;
-    }
-
-    /* INDIKATOR PAGE STYLE - MOBILE */
-    .indikator-box{
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: fit-content;
-    width: 100%;
-    }
-
-    .indikator-bar{
-    display:flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 16px;
-    min-height: 45px;
-    width: 100%;
-    background-color: var(--primary-color-50);
-    border-radius: 10px;
-    box-shadow: none !important;
-    }
-
-    /* CARDS GRID */
-    .cards-container {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        margin-bottom: 20px 0 20px 0;
-        margin-top: 20px;
-        width: 100%;
-    }
-
-    .card-content{
-        display: flex;
-        gap: 10px;
-    }
-
-    .card-icon{
-        width: 20px;
-        height: 20px;
-        aspect-ratio: 1/1;
-    }
-
-    .card-icon.humid-icon{
-         width: 20px;
-        height: 20px;
-        aspect-ratio: 1/1;
-    }
-
-    .card-content span{
-        display: flex;
-    }
-
-    .card {
-    min-width: 0;
-    box-sizing: border-box;
-    }
-
-    .card h3 {
-        font-size: 20px;
-    }
-
-    .card-content span {
-        font-size: 14px;
-    }
-
-    .card-footer p{
-        font-size: 14px;
-    }
-
-   
-
-    /* SENSOR PANEL */
-    .info-card {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .card, .sensor-name, .current-val, .current-status {
-        min-width: 0;
-        box-sizing: border-box;
-        width: 100%;
-    }
-
-    .sensor-name h3{
-        font-size: 12px;
-        display: flex;
-    }
-
-
-    /* MAPS */
-    .maps-box {
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .maps-content {
-        min-height: 250px;
-    }
-
-    .maps h4{
-        font-size: 22px;
-    }
-
-    /* SWITCH BUTTONS */
-    .swicth-container {
-        margin-bottom: 15px;
-    }
-
-    .swicth-btn-box {
-
-        gap: 8px;
-        flex-wrap: wrap;
-        width: 100%;
-    }
-
-    .sub-btn {
-        flex: 1;
-        min-width: 70px;
-        padding: 10px 14px 10px 8px;
-        font-size: 12px;
-        
-    }
-
-
-        /* MOBILE BOTTOM NAVBAR */
-    .mobile-bottom-nav {
-        display: flex !important;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 80px;
-        
-        background-color: var(--navbar-color);
-        border-top: 1px solid rgba(32, 49, 70, 0.15);
-
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        
-        z-index: 1000;
-    }
-
-    .nav-item{
-        display: flex;
-
-        height: auto;
-        aspect-ratio: 1/1;
-        flex-direction: row;
-        
-        fill: var(--primary-color-500);
-        border-radius: 5px;
-
-
-        padding: 5px;
-
-        transition: all 0.5 ease;
-    }
-
-    .nav-item svg{
-        width: 25px;
-        height: 25px;
-    }
-
-    .nav-item.data-analitik-m{
-        fill: transparent;
-        stroke-width: 1.5px;
-        stroke: var(--primary-color-500);
-    }
-
-    .nav-item.active{
-        background-color: var(--primary-color-800);
-        fill: #EEF2F7;
-        box-shadow: var(--shadow-color);
-    }
-    .nav-item.active.data-analitik-m{
-        stroke: #EEF2F7;
-        stroke-width: 0.7px;
-    }
-
-    /* ANALYTIC PAGE STYLE - MOBILE */
-    
-    /* HIDE */
-    .swicth-container h3{
-        display: none;
-    }
-    /*-----------*/
-    .swicth-container{
-        margin-bottom: 20px;
-        height: fit-content;
-        width: 100%;
-    }
-
-    .swicth-btn-box{
-        min-height: 50px;
-    }
-
-    .info-card{
-        display: flex;
-        flex-direction: row;
-    }
-    .sub-btn{
-        font-size: 10px;
-    }
-
-    .sensor-name p, .current-val p, .current-status p{
-        font-size: 14px !important;
-    }
-    
-    .sensor-name h3, .current-val h3, .current-status h3{
-        font-size: 18px !important;
-    }
-     /* CHARTS */
-    .chart {
-        flex-direction: column;
-        margin-bottom: 20px;
-    }
-
-    .daily-chart, .weekly-chart {
-        margin-bottom: 15px;
-    }
-
-    .chart-title {
-        font-size: 14px;
-    }
-
-    .daily-chart h4, .weekly-chart h4{
-        font-size: 22px;
-    }
-
-    .chart h5{
-        font-size: 16px;
-    }
-
-    /* WEATHER PAGE STYLE - MOBILE */
-    .prakiraan-cuaca h4{
-        font-size: 22px;
-        display: flex;
-        margin-bottom: 20px;
-
-    }
-
-    #cuaca-placeholder{
-        flex: 1 ;
-        height: 100%;
-        width: 100%;
-        padding: 0;
-    }
-
-    .forecast-day{
-        font-size: 20px;
-        font-weight: 500;
-        color: var(--primary-color-800);
-    }
-
-    .forecast-temp{
-        font-size: 16px;
-    }
-
-    .forecast-details {
-        display: flex;
-        flex-direction: row;
-        align-items: center;       
-        justify-content: space-around;   
-        gap: 50px;
-    }
-
-
-    .forecast-humidity {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-
-        font-size: var(--font-body-size);
-    }
-
-    .forecast-humidity svg{
-        width: 20px;
-        height: 20px;
-        aspect-ratio: 1/1;
-        fill: var(--primary-color-800);
-    }
-
-    .prakiraan-cuaca {
-        padding: 15px;
-    }
-
-    .forecast-row {
-        padding: 10px 5px;
-        gap: 15px;
-    }
-
-    .forecast-day {
-        font-size: 16px;
-        min-width: 100px;
-    }
-
-    .forecast-humidity, .forecast-temp {
-        font-size: 12px;
-    }
 }

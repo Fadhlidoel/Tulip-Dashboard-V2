@@ -3,7 +3,7 @@ const READ_API_KEY = 'Q4EK1PMPN150NY25';
 
 const SENSORS = {
     radiasi: { 
-        field: 'field1', unit: 'CPM', title: 'Level Radiasi', color: 'rgba(255, 206, 86, 1)', 
+        field: 'field1', unit: 'µSv', title: 'Level Radiasi', color: 'rgba(255, 206, 86, 1)', 
         sensorName: 'Geiger Counter', statusType: 'radiasi', htmlId:'radiation-value'
     },
     karbon: { 
@@ -17,6 +17,14 @@ const SENSORS = {
     kelembapan: { 
         field: 'field5', unit: '%', title: 'Kelembapan', color: 'rgba(75, 192, 192, 1)', 
         sensorName: 'DHT22', statusType: 'lembab', htmlId:'humidity-value'
+    },
+    tekanan: {
+        field: 'field7', unit: 'hPa', title: 'tekanan Udara',
+        sensorName: 'BMP280', statusType: 'tekanan', htmlId: 'weather-value'
+    },
+    altitude: {
+        field: 'field8', unit: 'm', title: 'altitude',
+        sensorName: 'BMP280', statusType: 'altitude', htmlId: 'altitude-value'
     }
 };
 
@@ -28,7 +36,7 @@ const STATUS_FIELDS = {
 
 const SENSOR_CONFIG = {
     'radiasi' : {
-        field: 'field1', unit: 'CPM', decimals: 3, color: 'rgba(249, 159, 57, 1)',
+        field: 'field1', unit: 'µSv', decimals: 3, color: 'rgba(249, 159, 57, 1)',
         panelId: 'panel-radiation',
         dailyChartId: 'radDailyChart', weeklyChartId: 'radWeeklyChart',
         currentValId: 'rad-current-val', 
@@ -46,7 +54,7 @@ const SENSOR_CONFIG = {
         dailyAvgId: 'co2-daily-average', weeklyAvgId: 'co2-weekly-average'
     },
     'suhu' : {
-        field: 'field4', unit: '°C', decimals: 1, color: 'rgba(116, 148, 190, 1)',
+        field: 'field4', unit: '°C', decimals: 1, color: 'rgba(100, 178, 206, 1)',
         panelId: 'panel-temp',
         dailyChartId: 'tempDailyChart', weeklyChartId: 'tempWeeklyChart',
         currentValId: 'temp-current-val', 
@@ -62,10 +70,22 @@ const SENSOR_CONFIG = {
         statusId: 'humid-current-status', // TAMBAHAN BARU
         statusType: 'lembab',             // TAMBAHAN BARU
         dailyAvgId: 'humid-daily-average', weeklyAvgId: 'humid-weekly-average'
+    },
+
+    'tekanan' : {
+        field: 'field7', unit: 'hPa', decimals: 1, color: 'rgba(160, 100, 206, 1)',
+        panelId: 'panel-press',
+        dailyChartId: 'pressDailyChart', weeklyChartId: 'pressWeeklyChart',
+        currentValId: 'press-current-val', 
+        statusId: 'press-current-status', // TAMBAHAN BARU
+        statusType: 'tekanan',             // TAMBAHAN BARU
+        dailyAvgId: 'press-daily-average', weeklyAvgId: 'press-weekly-average'
     }
 };
 
 let activeCharts = {}; 
+let myMap = null;
+let myMarker = null;
 
 const API_URLS = {
     ThinkSpeak: `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`,
@@ -98,10 +118,91 @@ function getStatus(val, type) {
         if (val >= 40 && val <= 60) return { text: "IDEAL", color: "#34d399" };
         return { text: "NORMAL", color: "#2daafdff" };
     }
+    if (type === 'tekanan') {
+        if (val > 1010) return {text: "CERAH", color: "#fab115ff"};
+        if (val <= 1010 && val >= 1006) return {text: 'MENDUNG', color: "#2daafdff"};
+        if (val < 1006) return {text: 'HUJAN/BADAI', color: "#1628ccff"};
+    }
     return { text: "Info", color: "black" };
 }
 
+// MAPS PLACEHOLDER
+function initMap() {
+    // DEFAULT LOCATION (POLTEK) //
+    const defaultLat = -7.778469597547526 ;
+    const defaultLng = 110.41245561741808;
 
+    myMap = L.map('mapid').setView([defaultLat, defaultLng], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(myMap);
+
+    myMarker = L.marker([defaultLat, defaultLng]).addTo(myMap)
+        .bindPopup("Lokasi Transmitter")
+        .openPopup();
+
+    setTimeout(() => { myMap.invalidateSize(); }, 500);
+}
+function updateMapLocation(lat, lng) {
+    if (!myMap || !myMarker) return;
+
+    // Cek validitas data (cegah error jika GPS mengirim 0 atau null)
+    if (lat && lng && !isNaN(lat) && !isNaN(lng) && lat !== 0) {
+        const newLatLng = new L.LatLng(lat, lng);
+        
+        // Pindahkan Marker
+        myMarker.setLatLng(newLatLng);
+        
+        // Geser Peta ke lokasi baru
+        myMap.panTo(newLatLng);
+        
+        console.log(`📍 Peta diupdate ke: ${lat}, ${lng}`);
+    }
+}
+
+function calculateRainChance(humidity, pressure) {
+    if(isNaN(humidity) || isNaN(pressure)) return { percent: 0, text: "Data Tidak Tersedia"};
+
+    let chance = 0;
+
+    if (humidity <= 50) {
+        chance = 10;
+    }
+    else {
+        chance = humidity;
+    }
+
+    if (pressure < 1000) {
+        chance += 30;
+    }
+    else if (pressure < 1010) {
+        chance += 15;
+    }
+    else if (pressure > 1018) {
+        chance -= 20;
+    }
+
+    chance = Math.max(0, Math.min(95, chance));
+
+    let text = "Cuaca cerah";
+    let colorClass = "Tidak Hujan";
+
+    if (chance >= 85 ) {
+        text = "Badai/Hujan lebat";
+    }
+    else if (chance >= 70) {
+        text = "Potensi Hujan";
+    }
+    else if (chance >= 40) {
+        text = "Mendung/Berawan";
+    }
+    else {
+        text = "Cuaca Cerah";
+    }
+
+    return {percent: chance.toFixed(0), text: text};
+}
 
 // FUNGSI HANDLE //
 function updateMetricCards(dataFeed) {
@@ -114,7 +215,9 @@ function updateMetricCards(dataFeed) {
         radiasi: parseFloat(dataFeed['field1']),
         karbon: parseFloat(dataFeed['field2']),
         suhu: parseFloat(dataFeed['field4']),
-        kelembapan: parseFloat(dataFeed['field5'])
+        kelembapan: parseFloat(dataFeed['field5']),
+        tekanan: parseFloat(dataFeed['field7']),
+        altitude: parseFloat(dataFeed['field8'])
     };
 
     console.log('Parsed values object:', values);
@@ -122,6 +225,8 @@ function updateMetricCards(dataFeed) {
     console.log('karbon value:', values.karbon, 'isNaN:', isNaN(values.karbon));
     console.log('suhu value:', values.suhu, 'isNaN:', isNaN(values.suhu));
     console.log('kelembapan value:', values.kelembapan, 'isNaN:', isNaN(values.kelembapan));
+    console.log('tekanan value:', values.tekanan, 'isNaN:', isNaN(values.tekanan));
+    console.log('altitude value:', values.altitude, 'isNaN', isNaN(values.altitude))
 
     for (const sensorType in SENSORS) {
         if (SENSORS.hasOwnProperty(sensorType)) {
@@ -129,6 +234,8 @@ function updateMetricCards(dataFeed) {
             const htmlId = sensorConfig.htmlId;
             const unit = sensorConfig.unit;
             const value = values[sensorType];
+            
+
 
             console.log(`\n📊 ${sensorType}:`);
             console.log(`  - htmlId: ${htmlId}`);
@@ -153,10 +260,56 @@ function updateMetricCards(dataFeed) {
             } else {
                 console.warn(`  ⚠️ ELEMENT NOT FOUND with ID: ${htmlId}`);
             }
+
+            const cpmElement = document.getElementById('cpm-value');
+
+             if (cpmElement) {
+                if(!isNaN(values.radiasi)) {
+                const cpm = values.radiasi*151;
+                cpmElement.textContent = cpm.toFixed(0) + " CPM";
+                }
+                else {
+                    cpm.textContent = "--";
+                }
+        }
+    }    
+}
+    console.groupEnd();
+
+    // PENGAMBILAN RUMUS PREDIKSI HUJAN //
+    const humidity = values.kelembapan; 
+    const pressure = values.tekanan;  
+
+    const hasilPrediksi = calculateRainChance(humidity, pressure);
+
+    const rainValEl = document.getElementById('rain-value');
+    const rainDescEl = document.getElementById('rain-desc');
+
+    if (rainValEl) {
+        rainValEl.textContent = hasilPrediksi.percent + "%";
+        
+        if (hasilPrediksi.percent > 70) {
+            rainValEl.style.color = '#2b2edbff'; 
+            rainDescEl.style.color = '#2b2edbff';
+        } 
+        else if (hasilPrediksi.percent >50) {
+            rainValEl.style.color = '#256fd1ff';
+            rainDescEl.style.color = '#256fd1ff';
+        }
+        else {
+            rainValEl.style.color = '#23b6f0ff';
+            rainDescEl.style.color = '#23b6f0ff';
         }
     }
-    console.groupEnd();
+
+    if (rainDescEl) {
+        const spanEl = rainDescEl.querySelector('span');
+        if (spanEl) spanEl.textContent = hasilPrediksi.text;
+    }
 }
+
+    
+
 
 /**
  * 2. DATA STATUS LORA GPS & BATERAI
@@ -165,7 +318,6 @@ function updateMetricCards(dataFeed) {
 function updateStatusIndicators(dataFeed) {
     const batt = parseFloat(dataFeed[STATUS_FIELDS.BATT_FIELD]);
     const rssi = parseFloat(dataFeed[STATUS_FIELDS.RSSI_FIELD]);
-    const lat = dataFeed[STATUS_FIELDS.GPS_LAT_FIELD];
 
     const bVal = isNaN(batt) ? 0 : Math.min(100, Math.max(0, batt));
     const elBat = document.getElementById('battery-status-value');
@@ -194,15 +346,33 @@ function updateStatusIndicators(dataFeed) {
         }
     }
 
-    const gpsVal = document.getElementById('gps-status-value');
+    const gpsRaw = dataFeed[STATUS_FIELDS.GPS_LAT_FIELD];
+    let lat = 0;
+    let lng = 0;
+    let gpsValid = false;
+
+    if( gpsRaw && gpsRaw !== "0" && gpsRaw !== null) {
+
+        if (String(gpsRaw).includes(',')) {
+            const parts =gpsRaw.split(',');
+            lat = parseFloat(parts[0]);
+            lng = parseFloat(parts[1]);
+            gpsValid = !isNaN(lat) && !isNaN(lng);
+        }
+    }
+
+    const gpsval = document.getElementById('gps-status-value');
     const gpsIcon = document.getElementById('gps-icon');
 
-    if (lat && lat !== "N/A" && lat !== "0" && !isNaN(parseFloat(lat))) {
-        if(gpsVal) gpsVal.textContent = "Aktif";
+    if(gpsValid) {
+        if(gpsval) gpsval.textContent = "Terhubung";
         if(gpsIcon) gpsIcon.style.fill = '#1760fd';
-    } else {
-        if(gpsVal) gpsVal.textContent = "Tidak Aktif";
-        if(gpsIcon) gpsIcon.style.fill = '#1760fd';
+
+        updateMapLocation(lat,lng);
+    }
+    else {
+        if(gpsval) gpsval.textContent = "Terputus";
+        if(gpsIcon) gpsIcon.style.fill = 'orange';
     }
 }
 
@@ -483,6 +653,7 @@ function processThingspeakData(json) {
     console.log('field5:', d.field5, `(type: ${typeof d.field5})`);
     console.log('field6:', d.field6, `(type: ${typeof d.field6})`);
     console.log('field7:', d.field7, `(type: ${typeof d.field7})`);
+    console.log('field8:', d.field8, `(type: ${typeof d.field8})`);
 
     console.groupEnd();
     
@@ -528,186 +699,169 @@ async function updateDashboard() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+    
+    // Inisialisasi Data Awal
     updateDashboard();
-
     setInterval(updateDashboard, 15000);
+
+    // --- SETUP NAVIGASI LENGKAP ---
+    setupNavigation();
+
+    // --- MEMEUAT PETA ---//
+    initMap();
 });
 
- // FUNGSI INSTALASI DAN NAVIGASI //
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    // NAVIGATION
-    const navDashBtn = document.getElementById('dash-btn');
-    const navDataBtn = document.getElementById('data-btn');
+function setupNavigation() {
+    // Definisi Element View
     const homeView = document.getElementById('home-view');
     const analyticView = document.getElementById('analytic-view');
-    const pageTitle = document.getElementById('page-title');
-
-    const cardSection = document.getElementById('cards-section');
-    const weatherSection = document.getElementById('weather-section');
-    const mapsSection = document.getElementById('map-section');
-
-
-    function handleResponsiveLayout() {
-        const isDesktop = window.innerWidth > 992;
-
-        if (isDesktop) {
-            // --- MODE DESKTOP ---
-            // Saat di desktop, kita WAJIB mereset (menghapus) style yang ditempel oleh mode mobile.
-            // Kita set ke '' (kosong) agar browser kembali mengikuti aturan file CSS (style.css).
-            
-            // Pastikan Home View menampilkan semua bagiannya
-            if(cardSection) cardSection.style.display = ''; 
-            if(weatherSection) weatherSection.style.display = ''; 
-            if(mapsSection) mapsSection.style.display = '';
-            
-        }
-        else {
-            // --- MODE MOBILE ---
-            // Cek tab mana yang sedang aktif (Home / Analytic / Weather)
-            const weatherBtn = document.querySelector('.nav-item[data-page="weather"]');
-            const analyticBtn = document.querySelector('.nav-item[data-page="analytic"]');
-            
-            const isWeatherActive = weatherBtn && weatherBtn.classList.contains('active');
-            const isAnalyticActive = analyticBtn && analyticBtn.classList.contains('active');
-
-            if (!isAnalyticActive) {
-                if (isWeatherActive) {
-                    // TAB CUACA: Sembunyikan Kartu & Peta, Tampilkan Cuaca
-                    if(cardSection) cardSection.style.display = 'none';
-                    if(mapsSection) mapsSection.style.display = 'none';
-                    if(weatherSection) weatherSection.style.display = '';
-                } else {
-                    // TAB HOME (Default): Tampilkan Kartu & Peta, Sembunyikan Cuaca
-                    if(cardSection) cardSection.style.display = '';
-                    if(mapsSection) mapsSection.style.display = '';
-                    if(weatherSection) weatherSection.style.display = 'none';
-                }
-            }
-        }
-    }
-    handleResponsiveLayout();
-    window.addEventListener('resize', handleResponsiveLayout);
-
-    function showElement(el) {
-        if (el) el.style.display = ''; 
-    }
-    // Fungsi ini memaksa elemen hilang
-    function hideElement(el) {
-        if (el) el.style.display = 'none';
-    }
-
-    if(navDashBtn && navDataBtn && homeView && analyticView && pageTitle) {
-        navDashBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            homeView.classList.remove('hidden');
-            analyticView.classList.add('hidden');
-            navDashBtn.classList.add('active');
-            navDataBtn.classList.remove('active');
-            pageTitle.innerHTML = 'Pantauan<br>Lingkungan';
-        });
-
-        navDataBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            homeView.classList.add('hidden');
-            analyticView.classList.remove('hidden');
-            navDashBtn.classList.remove('active');
-            navDataBtn.classList.add('active');
-            pageTitle.innerHTML = 'Analisa<br>Data';
-        });
-    }
-
-    // MOBILE NAVIGATION
-    const mobileNavItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
     
-    mobileNavItems.forEach(item => {
-        item.addEventListener('click', function(e) {
+    // Definisi Element Section di Home (untuk Mobile/Desktop handling)
+    const cardSection = document.getElementById('cards-section-small'); // Note: ID di HTML kamu cards-section-small
+    const weatherSection = document.getElementById('weather-section');
+    const rainSection = document.getElementById('rain-section');
+
+    // --- 1. LOGIKA TOMBOL DASHBOARD (SIDEBAR) ---
+    const dashBtn = document.getElementById('dash-btn');
+    if (dashBtn) {
+        dashBtn.addEventListener('click', (e) => {
             e.preventDefault();
             
-            const page = this.getAttribute('data-page');
-            
-            mobileNavItems.forEach(nav => nav.classList.remove('active'));
-            this.classList.add('active');
+            // Tampilkan Home, Sembunyikan Analytic
+            if(homeView) homeView.classList.remove('hidden');
+            if(analyticView) analyticView.classList.add('hidden');
 
-            if (page === 'analytic') {
-                homeView.classList.add('hidden');
-                analyticView.classList.remove('hidden');
-            }
-            else {
-                homeView.classList.remove('hidden');
-                analyticView.classList.add('hidden');
+            // Reset tombol sidebar aktif
+            document.querySelectorAll('.navbar-kiri .nav-link').forEach(l => l.classList.remove('active'));
+            dashBtn.classList.add('active');
 
-                if(page === 'home') {
-                    if(cardSection) cardSection.style.display = '';
-                    if(mapsSection) mapsSection.style.display = '';
-                    if (weatherSection) weatherSection.style.display = 'none';
-                }
-                else if (page === 'weather') {
-                    if (cardSection) cardSection.style.display = 'none';
-                    if (mapsSection) mapsSection.style.display = 'none';
-                    if (weatherSection) weatherSection.style.display = '';
-                }
-            }
-        });
-    });
-
-    if(navDashBtn) {
-        navDashBtn.addEventListener('click', function() {
+            // Pastikan elemen home terlihat (reset display style jika sebelumnya di-hide oleh script mobile)
             if(cardSection) cardSection.style.display = '';
-            if(mapsSection) mapsSection.style.display = '';
             if(weatherSection) weatherSection.style.display = '';
+            if(rainSection) rainSection.style.display = '';
+            
+            console.log("Navigasi: Ke Dashboard");
         });
     }
 
-    // NAVIGASI SUB BUTTON
-    function setupAnalyticNavigation() {
+    // --- LOGIKA TOMBOL SENSOR (SIDEBAR) ---
+    // Mapping: ID Tombol Sidebar -> ID Panel Detail -> Key Data -> ID Tombol Tab Atas
+    const sidebarMap = [
+        { btnId: 'rad-btn1',   panelId: 'panel-radiation', dataKey: 'radiasi',    tabId: 'rad-btn' },
+        { btnId: 'c02-btn1',   panelId: 'panel-co2',       dataKey: 'co2',        tabId: 'c02-btn' },
+        { btnId: 'temp-btn1',  panelId: 'panel-temp',      dataKey: 'suhu',       tabId: 'temp-btn' },
+        { btnId: 'humid-btn1', panelId: 'panel-humid',     dataKey: 'kelembapan', tabId: 'humid-btn' },
+        { btnId: 'press-btn1', panelId: 'panel-press',     dataKey: 'tekanan',    tabId: 'press-btn'},
+    ];
 
-        const NAV_MAPPING = {
-            'rad-btn' : 'panel-radiation',
-            'c02-btn' : 'panel-co2',
-            'temp-btn' : 'panel-temp',
-            'humid-btn' : 'panel-humid'
-        };
+    sidebarMap.forEach(item => {
+        const btn = document.getElementById(item.btnId);
+        
+        if (btn) {
+            // Mencegah link <a> di dalamnya refresh halaman
+            const link = btn.querySelector('a');
+            if(link) link.addEventListener('click', e => e.preventDefault());
 
-        const DATA_MAPPING = {
-            'rad-btn' : 'radiasi',
-            'c02-btn' : 'co2',
-            'temp-btn' : 'suhu',
-            'humid-btn' : 'kelembapan'
-        };
-
-        const allSubButtons = document.querySelectorAll('.sub-btn');
-        const allPanels = document.querySelectorAll('.sensor-panel');
-
-        allSubButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
 
-                allSubButtons.forEach(b => b.classList.remove('active'));
+                // A. Pindah View ke Analytic
+                if(homeView) homeView.classList.add('hidden');
+                if(analyticView) analyticView.classList.remove('hidden');
+
+                // B. Atur Tombol Sidebar Aktif
+                document.querySelectorAll('.navbar-kiri .nav-link').forEach(l => l.classList.remove('active'));
                 btn.classList.add('active');
 
-                allPanels.forEach(panel => {
-                    panel.classList.add('hidden');
-                });
+                // C. Tampilkan Panel yang Sesuai & Sembunyikan yang lain
+                document.querySelectorAll('.sensor-panel').forEach(p => p.classList.add('hidden'));
+                const targetPanel = document.getElementById(item.panelId);
+                if(targetPanel) targetPanel.classList.remove('hidden');
 
-                const panelTargetId = NAV_MAPPING[btn.id];
-                const targetPanel = document.getElementById(panelTargetId);
+                // D. Sinkronisasi Tombol Tab di Atas (Sub-btn)
+                // Supaya kalau kita klik sidebar "Suhu", tombol tab "Suhu" juga nyala
+                document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+                const targetTab = document.getElementById(item.tabId);
+                if(targetTab) targetTab.classList.add('active');
 
-                if (targetPanel) {
-                    targetPanel.classList.remove('hidden');
-                }
+                // E. Load Data Chart
+                loadSensorAnalytics(item.dataKey);
 
-                const sensorKey = DATA_MAPPING[btn.id]; 
-                if (sensorKey) {
-                    loadSensorAnalytics(sensorKey);
-                }
+                console.log(`Navigasi Sidebar: Ke ${item.dataKey}`);
             });
-        });
-        loadSensorAnalytics('radiasi');
-    }
-    setupAnalyticNavigation();
-});
+        }
+    });
 
- 
+    const cardsMove = [
+        {cardId: 'rad-move', panelId: 'panel-radiation', dataKey: 'radiasi', sidebarId: 'rad-btn1'},
+        {cardId: 'co2-move', panelId: 'panel-co2', dataKey: 'co2', sidebarId: 'c02-btn1' },
+        {cardId: 'temp-move', panelId: 'panel-temp', dataKey: 'suhu', sidebarId: 'temp-btn1'},
+        {cardId: 'humid-move', panelId: 'panel-humid', dataKey: 'kelembapan', sidebarId: 'humid-btn1'},
+        {cardId: 'press-move', panelId: 'panel-press', dataKey: 'tekanan', sidebarId: 'press-btn1'},
+    ];
+
+    cardsMove.forEach(item => {
+        const cardBtn = document.getElementById(item.cardId);
+
+        if (cardBtn) {
+            cardBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                if(homeView) homeView.classList.add('hidden');
+                if(analyticView) analyticView.classList.remove('hidden');
+
+                document.querySelectorAll('.sensor-panel').forEach(p => p.classList.add('hidden'));
+                const targetPanel = document.getElementById(item.panelId);
+                if(targetPanel) targetPanel.classList.remove('hidden');
+
+                document.querySelectorAll('.navbar-kiri .nav-link').forEach(l => l.classList.remove('active'));
+                const sidebarItem = document.getElementById(item.sidebarId);
+                if (sidebarItem) sidebarItem.classList.add('active');
+
+                loadSensorAnalytics(item.dataKey);
+                console.log(`Navigasi Card: Pindah ke ${item.dataKey}`);
+            })
+        }
+    })
+
+    setupChartToggles();
+}
+
+function setupChartToggles() {
+    const chartToggles = [
+        { harian: 'rad-harian-btn', mingguan: 'rad-mingguan-btn', dailyChart: 'radDailyChart', weeklyChart: 'radWeeklyChart', title: 'rad-chart-title', dailyAvg: 'rad-daily-average', weeklyAvg: 'rad-weekly-average' },
+        { harian: 'co2-harian-btn', mingguan: 'co2-mingguan-btn', dailyChart: 'co2DailyChart', weeklyChart: 'co2WeeklyChart', title: 'co2-chart-title', dailyAvg: 'co2-daily-average', weeklyAvg: 'co2-weekly-average' },
+        { harian: 'temp-harian-btn', mingguan: 'temp-mingguan-btn', dailyChart: 'tempDailyChart', weeklyChart: 'tempWeeklyChart', title: 'temp-chart-title', dailyAvg: 'temp-daily-average', weeklyAvg: 'temp-weekly-average' },
+        { harian: 'humid-harian-btn', mingguan: 'humid-mingguan-btn', dailyChart: 'humidDailyChart', weeklyChart: 'humidWeeklyChart', title: 'humid-chart-title', dailyAvg: 'humid-daily-average', weeklyAvg: 'humid-weekly-average' },
+        { harian: 'press-harian-btn', mingguan: 'press-mingguan-btn', dailyChart: 'pressDailyChart', weeklyChart: 'pressWeeklyChart', title: 'press-chart-title', dailyAvg: 'press-daily-average', weeklyAvg: 'press-weekly-average'}
+    ];
+    
+    chartToggles.forEach(toggle => {
+        const harianBtn = document.getElementById(toggle.harian);
+        const mingguanBtn = document.getElementById(toggle.mingguan);
+        const dailyChart = document.getElementById(toggle.dailyChart);
+        const weeklyChart = document.getElementById(toggle.weeklyChart);
+        const titleEl = document.getElementById(toggle.title);
+        const dailyAvgEl = document.getElementById(toggle.dailyAvg);
+        const weeklyAvgEl = document.getElementById(toggle.weeklyAvg);
+
+        if (harianBtn && mingguanBtn) {
+            harianBtn.addEventListener('click', () => {
+                harianBtn.classList.add('active');
+                mingguanBtn.classList.remove('active');
+                if (dailyChart) dailyChart.style.display = '';
+                if (weeklyChart) weeklyChart.style.display = 'none';
+                if (titleEl) titleEl.textContent = 'Grafik Harian';
+            });
+            
+            mingguanBtn.addEventListener('click', () => {
+                mingguanBtn.classList.add('active');
+                harianBtn.classList.remove('active');
+                if (dailyChart) dailyChart.style.display = 'none';
+                if (weeklyChart) weeklyChart.style.display = '';
+                if (titleEl) titleEl.textContent = 'Grafik Mingguan';
+            });
+        }
+    });
+}
