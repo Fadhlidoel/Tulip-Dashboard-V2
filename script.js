@@ -359,6 +359,11 @@ function updateStatusIndicators(dataFeed) {
             lng = parseFloat(parts[1]);
             gpsValid = !isNaN(lat) && !isNaN(lng);
         }
+        else {
+            lat = parseFloat(dataFeed['field8']);
+            lng = parseFloat(dataFeed['field6']);
+            gpsValid = !isNaN(lat) && !isNaN(lng) && lat !== 0;
+        }
     }
 
     const gpsval = document.getElementById('gps-status-value');
@@ -710,6 +715,14 @@ async function updateDashboard() {
 
     // --- MEMEUAT PETA ---//
     initMap();
+
+    if(window.innerWidth <= 992) {
+        const weatherSec = document.getElementById('weather-section');
+      
+
+        if(weatherSec) weatherSec.style.display = 'none';
+
+    }
 });
 
 function setupNavigation() {
@@ -721,6 +734,7 @@ function setupNavigation() {
     const cardSection = document.getElementById('cards-section-small'); // Note: ID di HTML kamu cards-section-small
     const weatherSection = document.getElementById('weather-section');
     const rainSection = document.getElementById('rain-section');
+    const predicSection = document.getElementById('predic-section');
 
     // --- 1. LOGIKA TOMBOL DASHBOARD (SIDEBAR) ---
     const dashBtn = document.getElementById('dash-btn');
@@ -745,14 +759,13 @@ function setupNavigation() {
         });
     }
 
-    // --- LOGIKA TOMBOL SENSOR (SIDEBAR) ---
-    // Mapping: ID Tombol Sidebar -> ID Panel Detail -> Key Data -> ID Tombol Tab Atas
+// --- LOGIKA TOMBOL SENSOR (SIDEBAR) ---
     const sidebarMap = [
-        { btnId: 'rad-btn1',   panelId: 'panel-radiation', dataKey: 'radiasi',    tabId: 'rad-btn' },
-        { btnId: 'c02-btn1',   panelId: 'panel-co2',       dataKey: 'co2',        tabId: 'c02-btn' },
-        { btnId: 'temp-btn1',  panelId: 'panel-temp',      dataKey: 'suhu',       tabId: 'temp-btn' },
-        { btnId: 'humid-btn1', panelId: 'panel-humid',     dataKey: 'kelembapan', tabId: 'humid-btn' },
-        { btnId: 'press-btn1', panelId: 'panel-press',     dataKey: 'tekanan',    tabId: 'press-btn'},
+        { btnId: 'rad-btn1',   panelId: 'panel-radiation', dataKey: 'radiasi'},
+        { btnId: 'c02-btn1',   panelId: 'panel-co2',       dataKey: 'co2'},
+        { btnId: 'temp-btn1',  panelId: 'panel-temp',      dataKey: 'suhu'},
+        { btnId: 'humid-btn1', panelId: 'panel-humid',     dataKey: 'kelembapan'},
+        { btnId: 'press-btn1', panelId: 'panel-press',     dataKey: 'tekanan'},
     ];
 
     sidebarMap.forEach(item => {
@@ -793,6 +806,7 @@ function setupNavigation() {
         }
     });
 
+/* NAVIGASI CARDS SENSOR KE PANEL MASING MASING */
     const cardsMove = [
         {cardId: 'rad-move', panelId: 'panel-radiation', dataKey: 'radiasi', sidebarId: 'rad-btn1'},
         {cardId: 'co2-move', panelId: 'panel-co2', dataKey: 'co2', sidebarId: 'c02-btn1' },
@@ -825,9 +839,71 @@ function setupNavigation() {
         }
     })
 
+/* NAVIGASI NAVBAR BAWAH MOBILE */
+    const mobileHomeBtn = document.getElementById('mobile-home-btn');
+    const mobileAnalyBtn = document.getElementById('mobile-analytic-btn');
+    const mobilePredicBtn = document.getElementById('mobile-predic-btn');
+    const mobileNavLogic = setupMobileSensorNav();
+
+    if(mobileHomeBtn) {
+        mobileHomeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if(homeView) homeView.classList.remove('hidden');
+            if(analyticView) analyticView.classList.add('hidden');
+
+            if(cardSection) cardSection.classList.remove('hidden');
+            if(rainSection) rainSection.classList.remove('hidden');
+            if(weatherSection) weatherSection.classList.add('hidden');
+            if(predicSection) predicSection.classList.add('hidden');
+
+            document.querySelectorAll('.btm-nav-mobile').forEach(b => b.classList.remove('active'));
+            mobileHomeBtn.classList.add('active')
+        });
+    }
+    
+    if(mobileAnalyBtn) {
+        mobileAnalyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if(homeView) homeView.classList.add('hidden');
+            if(analyticView) analyticView.classList.remove('hidden');
+
+            if(cardSection) cardSection.classList.add('hidden');
+            if(weatherSection) weatherSection.classList.add('hidden');
+            if(predicSection) predicSection.classList.add('hidden');
+
+            mobileNavLogic.showMobilePanel(0);
+            document.querySelectorAll('.btm-nav-mobile').forEach(b => b.classList.remove('active'));
+            mobileAnalyBtn.classList.add('active')
+        })
+    }
+    if(mobilePredicBtn) {
+        mobilePredicBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if(homeView) homeView.classList.remove('hidden');
+            if(analyticView) analyticView.classList.add('hidden');
+
+            if(cardSection) cardSection.classList.add('hidden');
+            if(rainSection) rainSection.classList.add('hidden');
+
+            if(weatherSection) {
+                weatherSection.classList.remove('hidden');
+                weatherSection.style.display = '';
+            }
+            if(predicSection) predicSection.classList.remove('hidden');
+
+            document.querySelectorAll('.btm-nav-mobile').forEach(b => b.classList.remove('active'));
+            mobilePredicBtn.classList.add('active')
+        })
+    }
+
+
     setupChartToggles();
 }
 
+/* NAVIGASI HARIAN/MINGGUAN */
 function setupChartToggles() {
     const chartToggles = [
         { harian: 'rad-harian-btn', mingguan: 'rad-mingguan-btn', dailyChart: 'radDailyChart', weeklyChart: 'radWeeklyChart', title: 'rad-chart-title', dailyAvg: 'rad-daily-average', weeklyAvg: 'rad-weekly-average' },
@@ -843,8 +919,6 @@ function setupChartToggles() {
         const dailyChart = document.getElementById(toggle.dailyChart);
         const weeklyChart = document.getElementById(toggle.weeklyChart);
         const titleEl = document.getElementById(toggle.title);
-        const dailyAvgEl = document.getElementById(toggle.dailyAvg);
-        const weeklyAvgEl = document.getElementById(toggle.weeklyAvg);
 
         if (harianBtn && mingguanBtn) {
             harianBtn.addEventListener('click', () => {
@@ -864,4 +938,51 @@ function setupChartToggles() {
             });
         }
     });
+}
+
+/* NAVIGASI PANAH PANEL MOBILE */
+function setupMobileSensorNav() {
+    const sensorList = [
+        {dataKey: 'radiasi', panelId: 'panel-radiation', title: 'Radiasi'},
+        {dataKey: 'co2', panelId: 'panel-co2', title: 'Kadar Karbon'},
+        {dataKey: 'suhu', panelId: 'panel-temp', title: 'suhu'},
+        {dataKey: 'kelembapan', panelId: 'panel-humid', title: 'Kelembapan'},
+        {dataKey: 'tekanan', panelId: 'panel-press', title: 'Tekanan Udara'},
+    ];
+
+    let currentIndex = 0;
+
+    const prevBtn = document.getElementById('prev-nav');
+    const nextBtn = document.getElementById('next-nav');
+    const titleEl = document.getElementById('mobile-nav-title');
+
+    function showMobilePanel(index) {
+
+        document.querySelectorAll('.sensor-panel').forEach(p => p.classList.add('hidden'));
+        const target = sensorList[index];
+
+        const targetPanel = document.getElementById(target.panelId);
+        if(targetPanel) targetPanel.classList.remove('hidden');
+        if(titleEl) titleEl.textContent = target.title;
+
+        loadSensorAnalytics(target.dataKey);
+    }
+
+    if(prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            currentIndex--;
+            if(currentIndex < 0) currentIndex = sensorList.length - 1;
+            showMobilePanel(currentIndex);
+        });
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            currentIndex++;
+            if(currentIndex >= sensorList.length) currentIndex = 0;
+            showMobilePanel(currentIndex);
+        });
+    }
+    return {showMobilePanel};
 }

@@ -65,7 +65,7 @@ body {
     --font-body-desktop-size: 16px;
     --font-body-desktop-small-size: 13px;
 
-    --fotn-h1-mobile-size: 28px;
+    --font-h1-mobile-size: 28px;
     --font-h2-mobile-size: 22px;
     --font-h3-mobile-size: 18px;
     --font-h4-mobile-size: 16px;
@@ -77,27 +77,23 @@ body {
     
 
     --font-button-desktop-size: 15px;
-    --font-button-mobile-size: 14px;
+    --font-button-mobile-size: 12px;
     --font-button-large-size: 24px;
     
     --border-radius: 20px;
     --shadow-color: -2px 2px 13.5px 0 rgba(0, 0, 0, 0.09);
 }
 
-
-/* MOBILE HEADER HIDDEN */
-.mobile-bottom-nav {
+/* MOBILE HIDDEN */
+.mobile-sensor-nav{
     display: none !important;
 }
-
-.mobile-logo-bar{
+.mobile-bottom-navbar{
     display: none !important;
 }
-
-.mobile-header-logo{
-    display: none;
+.header-content.mobile{
+    display: none !important;
 }
-
 
 /* NAVBAR STYLES */
 .navbar-kiri {
@@ -751,10 +747,41 @@ button{
     font-weight: 500;
     margin: 0;
 }
+.info-icon.rad h4{
+    color: var(--tertiary-color-800);
+}
+.info-icon.co2 h4{
+    color: var(--secondary-color-800);
+}
+.info-icon.temp h4{
+    color: var(--temp-color-800);
+}
+.info-icon.humid h4{
+    color: var(--primary-color-800);
+}
+.info-icon.press h4{
+    color: var(--rain-color-800);
+}
+
 .sensor-value{
     margin: 0;
     font-size: var(--font-h1-desktop-size);
     font-weight: 550;
+}
+.sensor-value.rad{
+    color: var(--tertiary-color-800);
+}
+.sensor-value.co2{
+    color: var(--secondary-color-800);
+}
+.sensor-value.temp{
+    color: var(--temp-color-800);
+}
+.sensor-value.humid{
+    color: var(--primary-color-800);
+}
+.sensor-value.press{
+    color: var(--rain-color-800);
 }
 
 .info-right{
@@ -894,5 +921,369 @@ button{
 
 /*------------ MOBILE STYLE ------------------*/
 @media screen and (max-width: 992px){
-    
+
+    body, html{
+        overflow-x: hidden;
+        padding-bottom: 50px;
+        width: 100% !important;
+    }
+    #main-content{
+        left: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        position: static;
+    }
+    #view-container{
+        padding: 20px 16px !important;
+    }
+
+/* DESKTOP HIDDEN */
+    .navbar-kiri {
+        display: none !important;
+    }
+    .header-content{
+        display: none !important;
+    }
+    .header-content{
+        display: hidden !important;
+    }
+
+/* NAVBAR BOTTOM MOBILE */
+    .mobile-bottom-navbar{
+        display: flex  !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+
+        height: 80px;
+        width: 100%;
+        align-items: center;
+        justify-content: space-around;
+        flex-direction: row;
+
+        background-color: var(--navbar-color);
+        box-shadow: 0px -2px 10px 0 rgba(0, 0, 0, 0.09);
+    }
+    .btm-nav-mobile{
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        width: 45px;
+        aspect-ratio: 1/1;
+        border-radius: 10px;
+
+    }
+    .nav-icon{
+        width: 25px;
+        aspect-ratio: 1/1;
+        fill: var(--primary-color-500);
+    }
+    .nav-icon.predic{
+        width: 30px;
+        aspect-ratio: 1/1;
+    }
+    .btm-nav-mobile.active{
+        background-color: var(--primary-color-800);
+        box-shadow: var(--shadow-color);
+    }
+    .btm-nav-mobile.active svg{
+        fill: var(--primary-color-50);
+    }
+
+/* HEADER MOBILE */
+    .header-content.mobile{
+        display: flex !important;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+        align-self: stretch;
+
+        padding: 24px 16px 30px 16px;
+
+        background-color: var(--navbar-color);
+        box-shadow: var(--shadow-color);
+
+        justify-content: space-around;
+        align-items: center;
+    }
+    .logo-web{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        align-self: stretch;
+        margin-bottom: 10px;
+    }
+    .logo{
+        width: 37px;
+        height: 37px;
+        aspect-ratio: 1/1;
+    }
+    .logo-web h2{
+        font-size: var(--font-h2-mobile-size);
+        font-weight: 500;
+        margin: 0;
+    }
+    .logo-text.p{
+        font-size: var(--font-body-mobile-small-size);
+        margin-bottom: 20px;
+    }
+
+    .indikator-box{
+        display: flex;
+        width: 100%;
+    }
+    .indikator-bar{
+        box-shadow: none;
+        display: flex;
+
+        background-color: var(--primary-color-50);
+        border-radius: 10px;
+
+        width: 100%;
+        max-width: 300px;
+        align-items: center;
+    }
+
+/* SENSOR CARDS MOBILE */
+    .cards-container-small{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        align-self: stretch;
+    }
+    .cards-container{
+        margin-bottom: 0;
+    }
+    .card-radiation{
+        display: flex;
+        grid-column: span 2;
+        padding: 20px 16px;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        align-self: stretch;
+        justify-self: stretch;
+    }
+    .card-carbon{
+        display: flex;
+        padding: 20px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        align-self: start;
+        justify-self: stretch;
+    }
+    .card{
+        width: 100%;
+        height: 100%;
+
+        align-items: flex-start;
+        justify-content: space-between;
+
+    }
+
+    .card-content svg{
+        width: 25px;
+        height: auto;
+    }
+    .card-content span{
+        font-size: var(--font-body-mobile-size);
+        font-weight: 500;
+    }
+    .cards-container-small .card h3{
+        font-size: var(--font-h3-mobile-size);
+        margin-top:-10px;
+    }
+    .cards-container-small .card.card-carbon h3, .cards-container-small .card.card-humidity h3{
+        margin-top: -20px;
+    }
+    .card p{
+        margin: 0;
+        padding: 0;
+    }
+    .card-footer{
+        margin: 0;
+        font-size: var(--font-body-mobile-small-size);
+    }
+    .rad-value2, .rad-value2.altitude{
+        margin-top: -20px;
+        font-size: var(--font-h5-mobile-size);
+    }
+
+/* PREDIKSI HUJAN MOBILE */
+    .card.card-rain span{
+        font-size: var(--font-body-mobile-size);
+    }
+    .card-value.rain{
+        font-size: var(--font-h1-mobile-size);
+    }
+
+/* ANALYTIC VIEW MOBILE */
+
+/* SWITCH BUTTON */
+    .sensor-nav-box{
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .mobile-sensor-nav{
+        display: flex !important;
+        padding: 15px 20px;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        align-self: stretch;
+        justify-content: space-between;
+        margin-bottom: 30px;
+
+        background-color: var(--primary-color-50);
+        border-radius: 10px;
+        box-shadow: var(--shadow-color);
+
+        height: fit-content;
+    }
+    .nav-arrow svg{
+        width: 12px;
+        height: 20px;
+        aspect-ratio: 3/5;
+        fill: var(--primary-color-500);
+    }
+    .nav-title{
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--primary-color-500);
+        margin: 0;
+    }
+
+/* DETAIL PANEL MOBILE */
+    .info-cont{
+        display: grid;
+        grid-template-columns: 2fr;
+        grid-template-rows: 3fr;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        align-self: stretch;    
+        padding-bottom: 30px;    
+    }
+    .info-left{
+        display: flex;
+        grid-column: span 2;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        align-self: stretch;
+        justify-self: stretch;
+    }
+    .info-right{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        justify-self: stretch;
+        grid-column: span 2;
+        gap: 10px;
+    }
+    .right-up{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        justify-self: stretch;
+
+        grid-column: 2 / span 1;
+        grid-row: 1 / sapn 2;
+    }
+    .ave-box{
+        gap: 10px;
+    }
+
+    .info-icon svg{
+        width: 25px;
+        height: auto;
+        aspect-ratio: 1/1;
+    }
+    .info-icon h4{
+        font-size: var(--font-h5-mobile-size);
+    }
+    .sensor-value{
+        font-size: var(--font-h3-mobile-size);
+    }
+    .info-right h5{
+        font-size: var(--font-h5-mobile-size);
+    }
+    .info-right h4{
+        font-size: var(--font-h3-mobile-size);
+    }
+
+    .chart{
+        padding: 16px;
+    }
+    .chart-header{
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .chart-header h4{
+        font-size: var(--font-h5-mobile-size);
+    }
+    .toggle-btn.harian-btn, .toggle-btn.mingguan-btn{
+        font-size: 10px;
+        width: 50%;
+        height: auto;
+    }
+    .toggle-btn.harian-btn.active{
+        font-size: 10px;
+        width: fixed;
+    }
+    .toggle-btn.mingguan-btn.active{
+        font-size: 10px;
+    }
+    .chart-wrapper {
+        min-height: 300px;
+        max-height: 300px;
+        width: 100%;
+    }
+
+/* HALAMAN KE-3 (PRAKIRAAN CUACA DAN MAPS) */
+    .prakiraan-cuaca-box{
+        display: flex;
+        flex-direction: column-reverse;
+        margin-bottom: 0;
+    }
+    .prakiraan-cuaca{
+        padding: 16px;
+    }
+    .prakiraan-cuaca-box h4{
+        font-size: var(--font-h5-mobile-size);
+    }
+    #cuaca-placeholder{
+        padding: 0;
+        margin-bottom: 20px;
+    }
+    .forecast-row{
+        justify-content: space-between;
+    }
+    .forecast-day{
+        font-size: var(--font-body-mobile-small-size);
+    }
+    .forecast-details{
+        font-size: var(--font-body-mobile-small-size);
+        justify-content: space-around;
+        gap: 50px;
+    }
+    .forecast-humidity svg{
+        width: 15px;
+        height: auto;
+        aspect-ratio: 1/1;
+    }
+
+    .maps{
+        margin-bottom: 0;
+    }
 }
