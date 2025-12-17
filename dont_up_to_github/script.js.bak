@@ -11,11 +11,11 @@ const SENSORS = {
         sensorName: 'MQ-7 (CO)', statusType: 'karbon', htmlId:'carbon-value'
     },
     suhu: { 
-        field: 'field3', unit: '°C', title: 'Suhu Lingkungan', color: 'rgba(255, 99, 132, 1)', 
+        field: 'field4', unit: '°C', title: 'Suhu Lingkungan', color: 'rgba(255, 99, 132, 1)', 
         sensorName: 'DHT22', statusType: 'suhu', htmlId:'temperature-value'
     },
     kelembapan: { 
-        field: 'field4', unit: '%', title: 'Kelembapan', color: 'rgba(75, 192, 192, 1)', 
+        field: 'field5', unit: '%', title: 'Kelembapan', color: 'rgba(75, 192, 192, 1)', 
         sensorName: 'DHT22', statusType: 'lembab', htmlId:'humidity-value'
     },
     tekanan: {
@@ -31,6 +31,7 @@ const SENSORS = {
 const STATUS_FIELDS = {
     BATT_FIELD: 'field5',
     RSSI_FIELD: 'field6',
+    GPS_LAT_FIELD: 'field8'
 }
 
 const SENSOR_CONFIG = {
@@ -53,7 +54,7 @@ const SENSOR_CONFIG = {
         dailyAvgId: 'co2-daily-average', weeklyAvgId: 'co2-weekly-average'
     },
     'suhu' : {
-        field: 'field3', unit: '°C', decimals: 1, color: 'rgba(100, 178, 206, 1)',
+        field: 'field4', unit: '°C', decimals: 1, color: 'rgba(100, 178, 206, 1)',
         panelId: 'panel-temp',
         dailyChartId: 'tempDailyChart', weeklyChartId: 'tempWeeklyChart',
         currentValId: 'temp-current-val', 
@@ -62,7 +63,7 @@ const SENSOR_CONFIG = {
         dailyAvgId: 'temp-daily-average', weeklyAvgId: 'temp-weekly-average'
     },
     'kelembapan' : {
-        field: 'field4', unit: '%', decimals: 1, color: 'rgba(116, 148, 190, 1)',
+        field: 'field5', unit: '%', decimals: 1, color: 'rgba(116, 148, 190, 1)',
         panelId: 'panel-humid',
         dailyChartId: 'humidDailyChart', weeklyChartId: 'humidWeeklyChart',
         currentValId: 'humid-current-val', 
@@ -85,7 +86,6 @@ const SENSOR_CONFIG = {
 let activeCharts = {}; 
 let myMap = null;
 let myMarker = null;
-let channelData = null;
 
 const API_URLS = {
     ThinkSpeak: `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`,
@@ -111,7 +111,7 @@ function getStatus(val, type) {
         if (val >= 35) return { text: "PANAS", color: "#f43f5e" };
     }
     if (type === 'radiasi') { // CPM (Sesuaikan threshold CPM-nya)
-        if (val <= 833333.333) return { text: "NORMAL", color: "#34d399" };
+        if (val <= 50) return { text: "NORMAL", color: "#34d399" };
         return { text: "BAHAYA", color: "#f43f5e" };
     }
     if (type === 'lembab') { // %
@@ -129,8 +129,8 @@ function getStatus(val, type) {
 // MAPS PLACEHOLDER
 function initMap() {
     // DEFAULT LOCATION (POLTEK) //
-    const defaultLat = -7.7783640416 ;
-    const defaultLng = 110.4124396123;
+    const defaultLat = null ;
+    const defaultLng = null;
 
     myMap = L.map('mapid').setView([defaultLat, defaultLng], 15);
 
@@ -158,20 +158,7 @@ function updateMapLocation(lat, lng) {
         myMap.panTo(newLatLng);
         
         console.log(`📍 Peta diupdate ke: ${lat}, ${lng}`);
-
-        document.querySelectorAll('.gps-val').forEach(el => {
-        el.textContent = "Terhubung";
-        el.style.color = '#1760fd';
-      });
-      document.querySelectorAll('.indikator-text.gps .indikator-name').forEach(label => {
-        label.style.color = '#1760fd';
-      });
-      document.querySelectorAll('.indikator-icon.gps').forEach(icon => {
-        icon.style.fill = '#1760fd';
-      });
     }
-
-
 }
 
 function calculateRainChance(humidity, pressure) {
@@ -179,43 +166,36 @@ function calculateRainChance(humidity, pressure) {
 
     let chance = 0;
 
-    if (humidity < 60) {
-        chance = 5;
-    }
-    else if (humidity < 80) {
-        chance = 10 + (humidity - 60) * 1.5;
+    if (humidity <= 50) {
+        chance = 10;
     }
     else {
-        chance = 40 + (humidity - 80) * 2;
+        chance = humidity;
     }
 
     if (pressure < 1000) {
-        chance += 50;
-    }
-    else if (pressure < 1008) {
         chance += 30;
     }
-    else if (pressure > 1014) {
-        chance -= 10;
+    else if (pressure < 1010) {
+        chance += 15;
     }
-    else if (pressure > 1020) {
-        chance -= 40;
+    else if (pressure > 1018) {
+        chance -= 20;
     }
+
     chance = Math.max(0, Math.min(95, chance));
 
     let text = "Cuaca cerah";
+    let colorClass = "Tidak Hujan";
 
     if (chance >= 85 ) {
         text = "Badai/Hujan lebat";
     }
-    else if (chance >= 65) {
+    else if (chance >= 70) {
         text = "Potensi Hujan";
     }
     else if (chance >= 40) {
-        text = "Mendung Tebal";
-    }
-    else if (chance >= 20) {
-        text = "Berawan";
+        text = "Mendung/Berawan";
     }
     else {
         text = "Cuaca Cerah";
@@ -234,8 +214,8 @@ function updateMetricCards(dataFeed) {
     const values = {
         radiasi: parseFloat(dataFeed['field1']),
         karbon: parseFloat(dataFeed['field2']),
-        suhu: parseFloat(dataFeed['field3']),
-        kelembapan: parseFloat(dataFeed['field4']),
+        suhu: parseFloat(dataFeed['field4']),
+        kelembapan: parseFloat(dataFeed['field5']),
         tekanan: parseFloat(dataFeed['field7']),
         altitude: parseFloat(dataFeed['field8'])
     };
@@ -283,13 +263,13 @@ function updateMetricCards(dataFeed) {
 
             const cpmElement = document.getElementById('cpm-value');
 
-            if (cpmElement) {
+             if (cpmElement) {
                 if(!isNaN(values.radiasi)) {
                 const cpm = values.radiasi*151;
                 cpmElement.textContent = cpm.toFixed(0) + " CPM";
                 }
                 else {
-                    cpmElement.textContent = "--";
+                    cpm.textContent = "--";
                 }
         }
     }    
@@ -373,48 +353,35 @@ function updateStatusIndicators(dataFeed) {
     document.querySelectorAll('.wifi-label').forEach(label => {
         label.style.color = signalColor;
     });
+    
 
-async function getChannelLocation() {
-  try {
-    const response = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`);
-    const data = await response.json();
+    let lat = 0;
+    let lng = 0;
+    let gpsValid = false;
 
-    const lat = data.latitude;
-    const lng = data.longitude;
+    const gpsText = gpsValid ? "Terhubung" : "Terputus";
+    const gpsColor = gpsValid ? '#1760fd' : 'orange'; // Biru vs Orange
 
-    console.log("Latitude:", lat, "Longitude:", lng);
+    // Update Teks GPS (Mobile & Desktop)
+    document.querySelectorAll('.gps-val').forEach(el => {
+        el.textContent = gpsText;
+        el.style.color = gpsColor; // Opsional: ubah warna teks juga
+    });
 
-    // Indikator koneksi
-    if (lat && lng) {
-      document.querySelectorAll('.gps-val').forEach(el => {
-        el.textContent = "Terhubung";
-        el.style.color = '#1760fd';
-      });
-      document.querySelectorAll('.indikator-text.gps .indikator-name').forEach(label => {
-        label.style.color = '#1760fd';
-      });
-      document.querySelectorAll('.indikator-icon.gps').forEach(icon => {
-        icon.style.fill = '#1760fd';
-      });
-    } else {
-      document.querySelectorAll('.gps-val').forEach(el => {
-        el.textContent = "Terputus";
-        el.style.color = 'orange';
-      });
-      document.querySelectorAll('.indikator-text.gps .indikator-name').forEach(label => {
-        label.style.color = 'orange';
-      });
-      document.querySelectorAll('.indikator-icon.gps').forEach(icon => {
-        icon.style.fill = 'orange';
-      });
+    // Update Icon GPS
+    document.querySelectorAll('.indikator-icon.gps').forEach(icon => {
+        icon.style.fill = gpsColor;
+    });
+    document.querySelectorAll('.indikator-text.gps .indikator-name').forEach(label => {
+        label.style.color = gpsColor;
+    });
+
+    // --- 4. Update Peta (Hanya perlu dipanggil sekali) ---
+    if (gpsValid) {
+        updateMapLocation(lat, lng);
     }
-  } catch (error) {
-    console.error("Error:", error);
-    document.getElementById("status").innerText = "❌ Terputus";
-  }
 }
-getChannelLocation();
-}
+
 /**
  * 3. RENDER CHART (DIPERBAIKI: DISTRIBUSI LABEL MERATA)
  */
@@ -684,11 +651,6 @@ function processThingspeakData(json) {
     console.log('✅ Latest feed (index 0):', d);
     console.log('Feed created_at:', d.created_at);
 
-    const c = json.channel;
-
-    console.log('Latest Feed', d);
-    console.log('Data Channel (lokasi):', c);
-
     console.log('=== CHECKING FIELD VALUES ===');
     console.log('field1:', d.field1, `(type: ${typeof d.field1})`);
     console.log('field2:', d.field2, `(type: ${typeof d.field2})`);
@@ -698,13 +660,11 @@ function processThingspeakData(json) {
     console.log('field6:', d.field6, `(type: ${typeof d.field6})`);
     console.log('field7:', d.field7, `(type: ${typeof d.field7})`);
     console.log('field8:', d.field8, `(type: ${typeof d.field8})`);
-    console.log('latitude:', d.latitude, `(type: ${typeof d.latitude})`);
-    console.log('longitude:', d.longitude, `(type: ${typeof d.longitude})`);
-    
-    updateMetricCards(d);
-    updateStatusIndicators(d, c);
 
     console.groupEnd();
+    
+    updateMetricCards(d);
+    updateStatusIndicators(d);
 }
 
 
