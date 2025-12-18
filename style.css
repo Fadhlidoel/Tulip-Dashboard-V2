@@ -111,29 +111,72 @@ body {
     padding: 30px 25px;
     align-self: stretch;
     height: 100%;
-    width: 100px;
+    width: 250px;
     z-index: 99;
+
+    transition: width 0.3s ease, padding 0.3s ease;
+    overflow: hidden;
+}
+.clps-btn{
+    width: 30px;
+    height: 30px;
+    aspect-ratio: 1/1;
+    justify-self: flex-start;
+    justify-content: flex-start;
+    align-items: center;
+
+    fill: var(--primary-color-500);
+    cursor: pointer;
 }
 
+.navbar-kiri .nav-text{
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.navbar-kiri.collapsed {
+    width: 80px;
+    padding: 30px 15px;
+    align-items: center;
+}
+.navbar-kiri.collapsed .clps-btn-box{
+    align-self: center;
+    justify-self: center;
+}
+.navbar-kiri.collapsed .nav-text{
+    opacity: 0;
+    display: none;
+}
+#main-content.wide{
+    left: 80px;
+    width: calc(100% - 80px);
+}
 
 
 ul {
     display: flex;
     flex-direction: column;
-    align-content: center;
+    align-content: flex-start;
     align-self: center;
     gap: 50px;
     padding: 0;
     margin: 0;
     width: 90%;
+    height: 200px;
     list-style-type: none;
 }
 
 .navbar-kiri ul li a{
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     color: #203146;
+    gap: 10px;
+
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
 
 }
 
@@ -152,11 +195,12 @@ ul {
     box-shadow: var(--shadow-color);
 
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 
     padding: 12px;
-    width: fit-content;
+    width: 100%;
+    height: 50px;
     aspect-ratio: 1/1;
     margin: 0;
 }
@@ -165,16 +209,16 @@ ul {
     fill: #EEF2F7;
 }
 
-
-
 /*MAIN CONTENT STYLES*/ 
 #main-content {
     flex-grow: 1;
     position: relative;
     height: 100%;
     position: relative;
-    left: 110px;
-    width: calc(100% - 110px);
+    left: 250px;
+    width: calc(100% - 250px);
+
+    transition: width 0.3s ease, left 0.3s ease;
 }
 
 

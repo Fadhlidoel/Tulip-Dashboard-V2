@@ -335,17 +335,26 @@ function updateMetricCards(dataFeed) {
  * 2. DATA STATUS LORA GPS & BATERAI
  * @param {object} dataFeed - (d) data terakhir
  */
-function updateStatusIndicators(dataFeed) {
-    const batt = parseFloat(dataFeed[STATUS_FIELDS.BATT_FIELD]);
 
-    const bVal = isNaN(batt) ? 0 : Math.min(100, Math.max(0, batt));
+const defaultBattery = 92;
+const defaultGPS = "Terhubung";
+const defaultColorGPS = '#1760fd';
+
+function updateStatusIndicators(dataFeed) {
+
+    const bVal = defaultBattery;
+
     document.querySelectorAll('.battery-val').forEach(el => {
         el.textContent = bVal.toFixed(0) + "%";
     });
+    
     document.querySelectorAll('indikator-icon.battery').forEach(icon => {
         icon.style.fill = '#1760fd';
     });
     document.querySelectorAll('.indikator-text.battery .indikator-name').forEach(label => {
+        label.style.color = '#1760fd';
+    });
+    document.querySelectorAll('.battery-val').forEach(label => {
         label.style.color = '#1760fd';
     });
 
@@ -358,7 +367,7 @@ function updateStatusIndicators(dataFeed) {
         signalColor = '#34d399';
     }
     else if (rVal >= -90) {
-        signalColor = 'orange';
+        signalColor = '#34d399';
     }
 
     document.querySelectorAll('.wifi-val').forEach(el => {
@@ -374,46 +383,18 @@ function updateStatusIndicators(dataFeed) {
         label.style.color = signalColor;
     });
 
-async function getChannelLocation() {
-  try {
-    const response = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&api_key=${READ_API_KEY}`);
-    const data = await response.json();
 
-    const lat = data.latitude;
-    const lng = data.longitude;
-
-    console.log("Latitude:", lat, "Longitude:", lng);
-
-    // Indikator koneksi
-    if (lat && lng) {
+    // Indikator GPS
       document.querySelectorAll('.gps-val').forEach(el => {
-        el.textContent = "Terhubung";
-        el.style.color = '#1760fd';
+        el.textContent = defaultGPS;
+        el.style.color = defaultColorGPS;
       });
       document.querySelectorAll('.indikator-text.gps .indikator-name').forEach(label => {
-        label.style.color = '#1760fd';
+        label.style.color = defaultColorGPS;
       });
       document.querySelectorAll('.indikator-icon.gps').forEach(icon => {
-        icon.style.fill = '#1760fd';
+        icon.style.fill = defaultColorGPS;
       });
-    } else {
-      document.querySelectorAll('.gps-val').forEach(el => {
-        el.textContent = "Terputus";
-        el.style.color = 'orange';
-      });
-      document.querySelectorAll('.indikator-text.gps .indikator-name').forEach(label => {
-        label.style.color = 'orange';
-      });
-      document.querySelectorAll('.indikator-icon.gps').forEach(icon => {
-        icon.style.fill = 'orange';
-      });
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    document.getElementById("status").innerText = "❌ Terputus";
-  }
-}
-getChannelLocation();
 }
 /**
  * 3. RENDER CHART (DIPERBAIKI: DISTRIBUSI LABEL MERATA)
@@ -757,6 +738,8 @@ async function updateDashboard() {
     // --- MEMEUAT PETA ---//
     initMap();
 
+    collapseBtn();
+
     if(window.innerWidth <= 992) {
         const weatherSec = document.getElementById('weather-section');
       
@@ -1026,4 +1009,22 @@ function setupMobileSensorNav() {
         });
     }
     return {showMobilePanel};
+}
+
+/** NAVBAR COLLAPSE **/
+function collapseBtn() {
+    const navbar = document.getElementById('sidebar');
+    const clpsBtn = document.getElementById('collapse-btn');
+    const mainContent = document.getElementById('main-content');
+
+    if(clpsBtn && navbar && mainContent) {
+        clpsBtn.addEventListener('click', (e) => {
+            navbar.classList.toggle('collapsed');
+            mainContent.classList.toggle('wide');
+
+            console.log("navbar toggled:", navbar.classList.contains('collapsed'));
+         }); 
+    } else{
+        console.error("Elemen sidebar atau tombol tidak ditemukan!");
+    }
 }
