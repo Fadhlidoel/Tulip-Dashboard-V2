@@ -119,9 +119,9 @@ function getStatus(val, type) {
         return { text: "NORMAL", color: "#2daafdff" };
     }
     if (type === 'tekanan') {
-        if (val > 1010) return {text: "CERAH", color: "#fab115ff"};
-        if (val <= 1010 && val >= 1006) return {text: 'MENDUNG', color: "#2daafdff"};
-        if (val < 1006) return {text: 'HUJAN/BADAI', color: "#1628ccff"};
+        if (val > 990) return {text: "TERIK", color: "#fab115ff"};
+        if (val <= 990 && val >= 985) return {text: 'CERAH', color: "#2daafdff"};
+        if (val < 985) return {text: 'MENDUNG', color: "#1628ccff"};
     }
     return { text: "Info", color: "black" };
 }
@@ -179,28 +179,23 @@ function calculateRainChance(humidity, pressure) {
 
     let chance = 0;
 
-    if (humidity < 60) {
+    if (humidity < 50) {
         chance = 5;
     }
     else if (humidity < 80) {
-        chance = 10 + (humidity - 60) * 1.5;
+        chance = (humidity - 50) * 1;
     }
     else {
-        chance = 40 + (humidity - 80) * 2;
+        chance = 30 + (humidity - 80) * 3.5;
     }
 
-    if (pressure < 1000) {
-        chance += 50;
+    if (pressure < 995) {
+        chance += 20;
     }
-    else if (pressure < 1008) {
-        chance += 30;
+    else if (pressure < 1005) {
+        chance -= 20;
     }
-    else if (pressure > 1014) {
-        chance -= 10;
-    }
-    else if (pressure > 1020) {
-        chance -= 40;
-    }
+    
     chance = Math.max(0, Math.min(95, chance));
 
     let text = "Cuaca cerah";
@@ -208,14 +203,11 @@ function calculateRainChance(humidity, pressure) {
     if (chance >= 85 ) {
         text = "Badai/Hujan lebat";
     }
-    else if (chance >= 65) {
+    else if (chance >= 60) {
         text = "Potensi Hujan";
     }
     else if (chance >= 40) {
-        text = "Mendung Tebal";
-    }
-    else if (chance >= 20) {
-        text = "Berawan";
+        text = "Mendung/Berawan";
     }
     else {
         text = "Cuaca Cerah";
