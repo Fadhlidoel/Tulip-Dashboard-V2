@@ -1025,6 +1025,7 @@ button{
         aspect-ratio: 1/1;
         fill: var(--primary-color-500);
     }
+  
     .nav-icon.predic{
         width: 30px;
         aspect-ratio: 1/1;
@@ -1090,7 +1091,7 @@ button{
         border-radius: 10px;
 
         width: 100%;
-        max-width: 300px;
+        max-width: 400px;
         align-items: center;
     }
 

@@ -129,8 +129,8 @@ function getStatus(val, type) {
 // MAPS PLACEHOLDER
 function initMap() {
     // DEFAULT LOCATION (POLTEK) //
-    const defaultLat = -7.7783640416 ;
-    const defaultLng = 110.4124396123;
+    const defaultLat = -7.778734189800205;
+    const defaultLng = 110.41389725309527;
 
     myMap = L.map('mapid').setView([defaultLat, defaultLng], 15);
 
